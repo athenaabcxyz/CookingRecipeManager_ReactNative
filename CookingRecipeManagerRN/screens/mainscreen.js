@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import RecipeItem from '../itemComponents/recipeItem';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
     View,
     Text,
@@ -9,24 +10,28 @@ import {
     SafeAreaView,
     ActivityIndicator,
     StatusBar,
-    RefreshControl
+    RefreshControl,
+    TouchableOpacity
 } from 'react-native'
+import Modal from 'react-native-modal';
 
-const apiKey = "12ac99b1218346a48dce60a6266c7a3a";
+const apiKey = "e6f3dc1b857f4ad0b84684bcf2da349d";
 
-function MainScreen(props) {
+function MainScreen({ navigation }) {
 
+    const Stack = createNativeStackNavigator();
+    <Stack.Screen name='RecipeItem' component={RecipeItem} />
     const [search, setSearch] = useState("");
     const [recipes, setrecipes] = useState([]);
-    const [apilink, setapilink] = useState("https://api.spoonacular.com/recipes/random?number=20&apiKey=12ac99b1218346a48dce60a6266c7a3a&tags=");
+    const [apilink, setapilink] = useState("https://api.spoonacular.com/recipes/random?number=20&apiKey=" + apiKey + "&tags=");
     const [isFetching, setFetching] = useState(false);
-    const [isResulted, setResult] = useState(true);
+    const [dataLength, setDataLength] = useState(1);
 
     const onRefresh = React.useCallback(() => {
-      fetchData()
+        fetchData()
     }, []);
 
-    const sorry='There is no result. \n (Ｔ▽Ｔ)'
+    const sorry = 'There is no result (Ｔ▽Ｔ).'
 
     const fetchData = () => {
         setFetching(true);
@@ -35,16 +40,11 @@ function MainScreen(props) {
             .then(json => {
                 setrecipes(json.recipes)
                 setFetching(false);
-                console.log(json)
             })
             .catch((error) => {
                 console.error(error);
                 setFetching(false)
             })
-            if(recipes.length<=0)
-            setResult(false)
-            else
-            setResult(true)
     }
 
     useEffect(() => {
@@ -52,31 +52,25 @@ function MainScreen(props) {
     }, []);
     useEffect(() => {
         fetchData()
-    },[apilink]);
+    }, [apilink]);
+
+    useEffect(() => {
+        if (typeof (recipes) == 'undefined')
+            setDataLength(1)
+        else
+            setDataLength(recipes.length)
+    }, [recipes]);
+
 
     const simpleSearch = () => {
         setFetching(true)
         const tags = search.split(' ').join(",").toLowerCase();
-        setapilink("https://api.spoonacular.com/recipes/random?number=20&apiKey=12ac99b1218346a48dce60a6266c7a3a&tags=".concat(tags))
+        setapilink("https://api.spoonacular.com/recipes/random?number=20&apiKey=" + apiKey + "&tags=".concat(tags))
     }
 
-    const data = [
-        { key: '1', value: 'Main course' },
-        { key: '2', value: 'Side dish' },
-        { key: '3', value: 'Dessert' },
-        { key: '4', value: 'Appetizer' },
-        { key: '5', value: 'Salad' },
-        { key: '6', value: 'Bread' },
-        { key: '7', value: 'Breakfast' },
-        { key: '8', value: 'Soup' },
-        { key: '9', value: 'Beverage' },
-        { key: '10', value: 'Sauce' },
-        { key: '11', value: 'Marinade' },
-        { key: '12', value: 'Fingerfood' },
-        { key: '13', value: 'Snack' },
-        { key: '14', value: 'Drink' },
-    ]
-
+    function selectRecipe(item) {
+        navigation.navigate('Detail', { id: item.id })
+    }
     return <SafeAreaView style={{
         backgroundColor: "orange",
         justifyContent: 'flex-start',
@@ -96,28 +90,32 @@ function MainScreen(props) {
                 //fontFamily: 'Sigmar-Regular'
             }}>DISHES</Text>
             <View style={{ flex: 0.3 }} />
-            <View style={{
-                flex: 1,
+           
+            <View style={{ flex: 0.05 }} />
+        </View>
+        <View style={{flexDirection: 'row', justifyContent: 'center', alignContent: 'center'}}>
+        <View style={{
+                height: 50,
                 flexDirection: 'row',
                 width: '90%',
-                borderColor: 'gray',
+                borderColor: 'white',
                 borderRadius: 10,
-                borderWidth: 2,
-                alignContent: 'center'
+                borderWidth: 3,
+                alignContent: 'center', 
+                marginTop: 10,
+                width: 350
             }}>
                 <TextInput
-                    onChangeText={ (text) => {setSearch(text)}}                    
+                    onChangeText={(text) => { setSearch(text) }}
                     onSubmitEditing={simpleSearch}
                     placeholder='Search by tags, ingredients,...'
                     placeholderTextColor={'white'}
                     textAlign='left'
                     fontWeight='bold'
                     color='white'
-                    style={{ flex: 1, paddingLeft: 10, paddingRight: 10 }} />
+                    style={{ flex: 1, paddingLeft: 10, paddingRight: 10, }} />
             </View>
-            <View style={{ flex: 0.05 }} />
-        </View>
-
+            </View>
         <View style={{
             flex: 1,
             marginTop: 20,
@@ -126,17 +124,19 @@ function MainScreen(props) {
             marginBottom: 10,
             alignContent: 'center',
             justifyContent: 'center'
-        }}>
-            {isResulted ? (<Text style={{textAlign:'center', alignSelf: 'center', fontSize: 20}}>
-                {sorry}
-                </Text>):(
-            <FlatList
-                    refreshControl={<RefreshControl refreshing={isFetching} onRefresh={onRefresh} />}
-                    data={recipes}
-                    renderItem={({ item }) => (<RecipeItem item={item} />)}
-                    keyExtractor={item => item.id}
-                />
-            )}
+        }}>{(dataLength > 0) ? (<FlatList
+            refreshControl={<RefreshControl refreshing={isFetching} onRefresh={onRefresh} />}
+            data={recipes}
+            renderItem={({ item }) => (<RecipeItem item={item} onPress={() => selectRecipe(item)} />)}
+            keyExtractor={item => item.id}
+        />) : (
+            <View style={{ flexDirection: 'column' }}>
+                <Text style={{ textAlign: 'center', fontSize: 20 }}>
+                    {sorry}
+                </Text>
+                <Text onPress={() => setapilink("https://api.spoonacular.com/recipes/random?number=20&apiKey=" + apiKey + "&tags=")} style={{ textAlign: 'center', fontSize: 20, color: 'blue' }}>Reload Page</Text>
+            </View>)}
+
         </View>
     </SafeAreaView>
 }

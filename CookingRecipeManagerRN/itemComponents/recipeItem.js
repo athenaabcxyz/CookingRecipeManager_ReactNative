@@ -5,36 +5,38 @@ import {
     Image,
     TouchableOpacity,
 } from 'react-native'
-
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { useRoute } from '@react-navigation/native';
 
 import TextTicker from 'react-native-text-ticker';
 
 
-function RecipeItem({ item }) {
-
+function RecipeItem({ item, onPress }) {
 
     let dishTypeList = '';
 
     item.dishTypes.forEach(element => {
         dishTypeList = dishTypeList + element + ", ";
     });
-    dishTypeList = dishTypeList.substring(0, dishTypeList.length-2);
+    dishTypeList = dishTypeList.substring(0, dishTypeList.length - 2);
 
     let cuisinesList = '';
 
     item.cuisines.forEach(element => {
         cuisinesList = cuisinesList + element + ", ";
     });
-    cuisinesList = cuisinesList.substring(0, cuisinesList.length-2);
+    cuisinesList = cuisinesList.substring(0, cuisinesList.length - 2);
 
     if (cuisinesList.length <= 0)
         cuisinesList = 'Uncategoried';
 
-        if (dishTypeList.length <= 0)
+    if (dishTypeList.length <= 0)
         dishTypeList = 'uncategoried';
 
     return (
         <TouchableOpacity
+            onPress={onPress}
             style={{
                 height: 150,
                 paddingTop: 20,
@@ -112,7 +114,7 @@ function RecipeItem({ item }) {
                         style={{
                             color: 'green',
                             fontSize: 13,
-                            marginEnd:10 
+                            marginEnd: 10
                         }}>{dishTypeList}</TextTicker>
                 </View>
 
@@ -121,7 +123,7 @@ function RecipeItem({ item }) {
                         color: 'black',
                         fontSize: 13,
                     }}>Cuisines: </Text>
-                    <TextTicker   duration={15000}
+                    <TextTicker duration={15000}
                         loop
                         bounce
                         repeatSpacer={50}
@@ -129,13 +131,12 @@ function RecipeItem({ item }) {
                         style={{
                             color: 'green',
                             fontSize: 13,
-                            marginEnd:10
-                    }}>{cuisinesList}</TextTicker>
+                            marginEnd: 10
+                        }}>{cuisinesList}</TextTicker>
                 </View>
             </View>
         </TouchableOpacity>
     )
-    console.log(url)
 }
 
 export default RecipeItem
