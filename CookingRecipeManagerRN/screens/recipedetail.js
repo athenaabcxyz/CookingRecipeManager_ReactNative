@@ -77,6 +77,11 @@ function RecipeDetail({navigation, route}) {
         })
     }, [recipe]);
 
+    function viewInstruction(id) {
+        navigation.navigate('Instruction', { id: id })
+        console.log('recipe: ' + id)
+    }
+
     return (<SafeAreaView style={{
         backgroundColor: "orange",
         justifyContent: 'flex-start',
@@ -251,6 +256,7 @@ function RecipeDetail({navigation, route}) {
                     marginBottom: 20
                 }}>
                     <TouchableOpacity
+                        onPress={() => viewInstruction(recipe.id)}
                         style={{
                             borderWidth: 5,
                             borderColor: 'white',

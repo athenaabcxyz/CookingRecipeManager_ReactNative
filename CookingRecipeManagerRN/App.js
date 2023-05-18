@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import RecipeDetail from './screens/recipedetail';
 import MainScreen from './screens/mainscreen';
+import RecipeInstruction from './screens/recipeinstruction';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import RecipeItem from './itemComponents/recipeItem';
@@ -19,6 +20,7 @@ export default function App() {
           <Stack.Screen name='Dishes' component={MainScreen}/>
           <Stack.Screen name='Detail' component={RecipeDetail}/>
           <Stack.Screen name='Recipe' component={RecipeItem}/>
+          <Stack.Screen name='Instruction' component={RecipeInstruction}/>
         </Stack.Navigator>
       </NavigationContainer>
 
