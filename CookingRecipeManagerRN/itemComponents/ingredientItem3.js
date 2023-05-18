@@ -10,9 +10,9 @@ import {
 import TextTicker from 'react-native-text-ticker';
 
 
-function EquipmentItem({ item }) {
+function IngredientItem3({ item }) {
 
-    let imageURL = "https://spoonacular.com/cdn/equipment_100x100/" + item.image;
+    let imageURL = "https://spoonacular.com/cdn/ingredients_100x100/" + item.image;
 
     const words = item.name.split(" ");
 
@@ -20,47 +20,48 @@ function EquipmentItem({ item }) {
         words[i] = words[i][0].toUpperCase() + words[i].substr(1);
     }
 
-    let equipmentName = words.join(" ");
+    let ingredientName = words.join(" ");
 
     return (
         <View
             style={{
-                width: 60,
+                height: 50,
                 paddingTop: 5,
                 paddingLeft: 5,
                 paddingRight: 5,
                 marginTop: 5,
-                flexDirection: 'column',
+                marginStart: 0,
+                flexDirection: 'row',
                 borderRadius: 10,
                 backgroundColor: 'white',
-                alignitems: 'center'
+                borderWidth: 2,
+                borderColor: 'green'
             }}>
             <Image
                 style={{
-                    width: 50,
-                    height: 50,
+                    width: 35,
+                    height: 35,
+                    marginTop: 0,
                     resizeMode: 'cover',
                     borderRadius: 5,
-                    borderColor: 'green',
-                    marginTop: 5,
-                    borderWidth: 2
+                    marginRight: 15,
                 }}
                 source={{
                     uri: imageURL
                 }} />
             <View style={{
                 flex: 1,
-                marginRight: 0,
+                marginRight: 10
             }}>
                 <Text
                     style={{
                         color: 'black',
-                        fontSize: 12,
-                        marginRight: 5,
-                    }}>{equipmentName}</Text>
+                        fontSize: 15,
+                        fontWeight: 'bold'
+                    }}>{ingredientName}</Text>             
             </View>
         </View>
     )
 }
 
-export default EquipmentItem
+export default IngredientItem3

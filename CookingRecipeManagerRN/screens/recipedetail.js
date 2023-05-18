@@ -18,7 +18,7 @@ import {
 
 import { useRoute } from '@react-navigation/native';
 
-const apiKey = "e6f3dc1b857f4ad0b84684bcf2da349d"; //"12ac99b1218346a48dce60a6266c7a3a";
+const apiKey = "12ac99b1218346a48dce60a6266c7a3a"//"e6f3dc1b857f4ad0b84684bcf2da349d"; //;
 
 function RecipeDetail({navigation, route}) {
     const [id, setid] = useState(route.params.id);
@@ -41,11 +41,23 @@ function RecipeDetail({navigation, route}) {
             .then(json => {
                 setrecipe(json)
                 setFetching(false)
+                console.log("recipe id: "+recipe.id)
             })
             .catch((error) => {
                 console.error(error);
                 setFetching(false)
             })
+    }
+
+    const getRecipeSumary = (summary) =>{
+        if(typeof(summary)!='undefined'){
+        let result = summary.replaceAll("<b>","");
+        result = result.replaceAll("</b>","");
+        result = result.replaceAll("<a href=","");
+        result = result.replaceAll("</a>","");
+        result = result.replaceAll(">", " - ")
+        return result
+        }
     }
 
     const toggleNutritionChart = () => {
@@ -75,6 +87,7 @@ function RecipeDetail({navigation, route}) {
 
             setFetching2(false)
         })
+
     }, [recipe]);
 
     function viewInstruction(id) {
@@ -210,7 +223,7 @@ function RecipeDetail({navigation, route}) {
                         textAlign: 'left'
                     }
                 }>
-                    {recipe.summary}
+                    {getRecipeSumary(recipe.summary)}
                 </Text>
                 <View style={{
                     justifyContent: 'center',
@@ -233,7 +246,7 @@ function RecipeDetail({navigation, route}) {
                         width: 300,
                         borderRadius: 10,
                     }}>
-                        {(!isFetching) ? (<FlatList
+                    <FlatList
                             nestedScrollEnabled={true}
                             data={recipe.extendedIngredients}
                             renderItem={({ item }) => (<IngredientItem item={item} />)}
@@ -243,10 +256,7 @@ function RecipeDetail({navigation, route}) {
                                 maxHeight: 300,
                             }}
 
-                        />) : (<Text style={{ textAlign: 'center', alignSelf: 'center', fontSize: 20 }}>
-                            {error}
-                        </Text>
-                        )}
+                        />
 
                     </View>
                 </View>
@@ -291,16 +301,13 @@ function RecipeDetail({navigation, route}) {
                         marginBottom: 10,
                     }}>Similar Recipes</Text>
                     <View>
-                        {(!isFetching2) ? (<FlatList
+                        <FlatList
                             nestedScrollEnabled={true}
                             horizontal={true}
                             data={similarRecipe}
                             renderItem={({ item }) => (<SimilarItem item={item} onPress={()=>setid(item.id)}/>)}
                             keyExtractor={item => item.id}
-                        />) : (<Text style={{ textAlign: 'center', alignSelf: 'center', fontSize: 20 }}>
-                            {error}
-                        </Text>
-                        )}
+                        /> 
 
                     </View>
                 </View>

@@ -9,15 +9,19 @@ import {
     StatusBar,
     Image,
     TouchableOpacity,
-    ScrollView
+    ScrollView, 
 } from 'react-native'
 import EquipmentItem from '../itemComponents/equipmentitem';
 import IngredientItem from '../itemComponents/ingredientitem';
+import IngredientItem3 from './ingredientItem3';
 
 
 function InstructionItem({ item }) {
+    const [isdone, setdone] = useState(false);
+
     return (
         <View
+        nestedScrollEnabled={true}
             style={{
                 width: 300,
                 paddingTop: 15,
@@ -31,12 +35,15 @@ function InstructionItem({ item }) {
                 backgroundColor: 'white',
                 alignitems: 'center'
             }}>
+                <View style={{flexDirection: 'row'}}>
             <Text
                 style={{
                     color: 'black',
                     fontSize: 20,
                     fontWeight: 'bold'
                 }}>Step: {item.number}</Text>
+                <View style={{flex:1}}/>
+                </View>
             <Text
                 style={{
                     color: 'black',
@@ -67,6 +74,12 @@ function InstructionItem({ item }) {
                     fontSize: 16,
                     fontWeight: 'bold'
                 }}>Ingredients needed:</Text>
+                <ScrollView
+                nestedScrollEnabled={true}
+                 style={{
+                    maxHeight: 300,
+                    marginBottom: 10
+                }}>
             {(item.ingredients.length == 0) ?
                 (<Text
                     style={{
@@ -74,11 +87,16 @@ function InstructionItem({ item }) {
                         fontSize: 16,
                     }}>None</Text>)
                 :
-                (<FlatList
+                (
+                <FlatList
+                    scrollEnabled={true}
+                    nestedScrollEnabled={true}
                     data={item.ingredients}
-                    renderItem={({ item }) => (<IngredientItem item={item} />)}
+                    renderItem={({ item }) => (<IngredientItem3 item={item} />)}
                     keyExtractor={item => item.id}/>
                 )}
+                </ScrollView>
+                <View>
             <Text
                 style={{
                     color: 'black',
@@ -90,6 +108,7 @@ function InstructionItem({ item }) {
                     color: 'black',
                     fontSize: 15,
                 }}>{item.step}</Text>
+                </View>
         </View>
     )
 }

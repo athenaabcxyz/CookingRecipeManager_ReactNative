@@ -20,12 +20,13 @@ import { useRoute } from '@react-navigation/native';
 
 const apiKey = "12ac99b1218346a48dce60a6266c7a3a"; //"12ac99b1218346a48dce60a6266c7a3a";
 
-function RecipeDetail({navigation, route}) {
+function RecipeInstruction({ navigation, route }) {
     const [id, setid] = useState(route.params.id);
     const [apilink, setapilink] = useState("https://api.spoonacular.com/recipes/" + id + "/information?includeNutrition=true&apiKey=" + apiKey);
     const [isFetching, setFetching] = useState(false);
     const [recipe, setrecipe] = useState([]);
     const [instructions, setInstructions] = useState([]);
+    const [isGetingInstruction, setGettingInstruction] = useState(false)
 
     const error = 'There is error while loading. \n (Ｔ▽Ｔ)'
 
@@ -37,8 +38,7 @@ function RecipeDetail({navigation, route}) {
                 console.clear()
                 setrecipe(json)
                 setFetching(false)
-                setInstructions(recipe.analyzedInstructions)
-                console.log(instructions)
+  
             })
             .catch((error) => {
                 console.error(error);
@@ -54,6 +54,24 @@ function RecipeDetail({navigation, route}) {
         setapilink("https://api.spoonacular.com/recipes/" + id + "/information?includeNutrition=true&apiKey=" + apiKey)
         fetchData();
     }, [id]);
+    useEffect(()=>{
+        getInstruction(recipe.id)
+    },[recipe])
+
+    const getInstruction = (id) => {
+        setGettingInstruction(true)
+        fetch("https://api.spoonacular.com/recipes/" + id + "/analyzedInstructions?&apiKey=" + apiKey)
+            .then(res => res.json())
+            .then(json => {
+                setInstructions(json)
+                console.log(instructions)
+                setGettingInstruction(false)
+            })
+            .catch((error) => {
+                console.error(error);
+                setGettingInstruction(false)
+            })
+    }
 
     return (<SafeAreaView style={{
         backgroundColor: "orange",
@@ -174,20 +192,32 @@ function RecipeDetail({navigation, route}) {
                         marginBottom: 10,
                         borderRadius: 10,
                     }}>
+                        {isFetching ? (
+                            <View style={{
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}>
+                                <ActivityIndicator size="large" color="white" style={{
+                                    alignSelf: 'center',
+                                    marginTop: 150
+                                }} />
+                            </View>
+                        ) : (
                             <FlatList
                                 data={instructions}
+                                nestedScrollEnabled={true}
                                 renderItem={({ item }) => (
                                     <View>
-                                        {(item.name == "") ? 
-                                        (<Text style={{
-                                            fontSize: 30,
-                                            fontWeight: 'bold',
-                                            color: 'white',
-                                            marginStart: 15,
-                                            fontStyle: 'italic',
-                                            //fontFamily: 'Sigmar-Regular'
-                                        }}>Main Instruction</Text>) 
-                                        : 
+                                        {(item.name == "") ?
+                                            (<Text style={{
+                                                fontSize: 30,
+                                                fontWeight: 'bold',
+                                                color: 'white',
+                                                marginStart: 15,
+                                                fontStyle: 'italic',
+                                                //fontFamily: 'Sigmar-Regular'
+                                            }}>Main Instruction</Text>)
+                                            :
                                             (<Text style={{
                                                 fontSize: 30,
                                                 fontWeight: 'bold',
@@ -196,7 +226,7 @@ function RecipeDetail({navigation, route}) {
                                                 fontStyle: 'italic',
                                                 //fontFamily: 'Sigmar-Regular'
                                             }}>Ingredient Instruction: {item.name}</Text>
-                                        )}
+                                            )}
                                         <FlatList
                                             nestedScrollEnabled={true}
                                             data={item.steps}
@@ -209,7 +239,7 @@ function RecipeDetail({navigation, route}) {
                                     </View>
                                 )}
                                 keyExtractor={(item, index) => index}
-                            />
+                            />)}
                     </View>
                 </View>
             </ScrollView>
@@ -217,4 +247,4 @@ function RecipeDetail({navigation, route}) {
     </SafeAreaView>);
 }
 
-export default RecipeDetail
+export default RecipeInstruction
