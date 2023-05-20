@@ -15,7 +15,7 @@ import {
 } from 'react-native'
 import Modal from 'react-native-modal';
 
-const apiKey = "e6f3dc1b857f4ad0b84684bcf2da349d";
+const apiKey = "12ac99b1218346a48dce60a6266c7a3a";
 
 function MainScreen({ navigation }) {
 
@@ -26,9 +26,12 @@ function MainScreen({ navigation }) {
     const [apilink, setapilink] = useState("https://api.spoonacular.com/recipes/random?number=20&apiKey=" + apiKey + "&tags=");
     const [isFetching, setFetching] = useState(false);
     const [dataLength, setDataLength] = useState(1);
+    const [searchResult, setSearchResult] = useState([]);
+    const [textInput, setTextInput] = useState("Input text to search")
 
     const onRefresh = React.useCallback(() => {
         fetchData()
+        setTextInput("Input text to search")
     }, []);
 
     const sorry = 'There is no result (Ｔ▽Ｔ).'
@@ -39,7 +42,6 @@ function MainScreen({ navigation }) {
             .then(res => res.json())
             .then(json => {
                 setrecipes(json.recipes)
-                setFetching(false);
             })
             .catch((error) => {
                 console.error(error);
@@ -59,13 +61,41 @@ function MainScreen({ navigation }) {
             setDataLength(1)
         else
             setDataLength(recipes.length)
+        setFetching(false)
     }, [recipes]);
 
 
     const simpleSearch = () => {
         setFetching(true)
-        const tags = search.split(' ').join(",").toLowerCase();
-        setapilink("https://api.spoonacular.com/recipes/random?number=20&apiKey=" + apiKey + "&tags=".concat(tags))
+        fetch("https://api.spoonacular.com/recipes/complexSearch?number=20&apiKey=" + apiKey + "&query=" + search)
+            .then(res => res.json())
+            .then(json => {
+                setSearchResult(json.results)
+            })
+            .catch((error) => {
+                console.error(error);
+                setFetching(false)
+            })
+    }
+
+    useEffect(() => {
+        setFetching(true)
+        getRecipeDetailList()
+    }, [searchResult])
+
+    const getRecipeDetailList = () => {
+        setrecipes([])
+        for (let i = 0; i < searchResult.length; i++) {
+            fetch("https://api.spoonacular.com/recipes/" + searchResult[i].id + "/information?apiKey=" + apiKey)
+                .then(res => res.json())
+                .then(json => {
+                    setrecipes(current => [...current, json])
+                })
+                .catch((error) => {
+                    console.error(error);
+                    setFetching(false)
+                })
+        }
     }
 
     function selectRecipe(item) {
@@ -90,32 +120,32 @@ function MainScreen({ navigation }) {
                 //fontFamily: 'Sigmar-Regular'
             }}>DISHES</Text>
             <View style={{ flex: 0.3 }} />
-           
+
             <View style={{ flex: 0.05 }} />
         </View>
-        <View style={{flexDirection: 'row', justifyContent: 'center', alignContent: 'center'}}>
-        <View style={{
+        <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center' }}>
+            <View style={{
                 height: 50,
                 flexDirection: 'row',
                 width: '90%',
                 borderColor: 'white',
                 borderRadius: 10,
-                borderWidth: 3,
-                alignContent: 'center', 
+                borderWidth: 5,
+                alignContent: 'center',
                 marginTop: 10,
                 width: 350
             }}>
                 <TextInput
-                    onChangeText={(text) => { setSearch(text) }}
+                    onChangeText={(text) => { setSearch(text), setTextInput(text) }}
                     onSubmitEditing={simpleSearch}
-                    placeholder='Search by tags, ingredients,...'
+                    placeholder={textInput}
                     placeholderTextColor={'white'}
                     textAlign='left'
                     fontWeight='bold'
                     color='white'
                     style={{ flex: 1, paddingLeft: 10, paddingRight: 10, }} />
             </View>
-            </View>
+        </View>
         <View style={{
             flex: 1,
             marginTop: 20,

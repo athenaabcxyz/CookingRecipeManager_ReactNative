@@ -5,6 +5,7 @@ import RecipeInstruction from './screens/recipeinstruction';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import RecipeItem from './itemComponents/recipeItem';
+import AdvanceSearch from './screens/advanceSearch';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,7 +24,6 @@ export default function App() {
           <Stack.Screen name='Instruction' component={RecipeInstruction}/>
         </Stack.Navigator>
       </NavigationContainer>
-
   );
 }
 
