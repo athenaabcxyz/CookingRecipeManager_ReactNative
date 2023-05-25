@@ -11,18 +11,23 @@ import {
     ActivityIndicator,
     StatusBar,
     RefreshControl,
-    TouchableOpacity
+    TouchableOpacity,
+    Image,
+    BackHandler
 } from 'react-native'
 import Modal from 'react-native-modal';
+import { useRoute } from '@react-navigation/native';
 
-const apiKey = "12ac99b1218346a48dce60a6266c7a3a";
+const apiKey = "e6f3dc1b857f4ad0b84684bcf2da349d";
 
-function MainScreen({ navigation }) {
+function MainScreen({ navigation, route }) {
 
     const Stack = createNativeStackNavigator();
+    const currentScreen="Dishes";
     <Stack.Screen name='RecipeItem' component={RecipeItem} />
     const [search, setSearch] = useState("");
     const [recipes, setrecipes] = useState([]);
+    const [currentUser, setCurrentUser] = useState(route.params.currentUser)
     const [apilink, setapilink] = useState("https://api.spoonacular.com/recipes/random?number=20&apiKey=" + apiKey + "&tags=");
     const [isFetching, setFetching] = useState(false);
     const [dataLength, setDataLength] = useState(1);
@@ -51,6 +56,7 @@ function MainScreen({ navigation }) {
 
     useEffect(() => {
         fetchData();
+        console.log('Current User: '+route.params.currentUser)
     }, []);
     useEffect(() => {
         fetchData()
@@ -99,7 +105,7 @@ function MainScreen({ navigation }) {
     }
 
     function selectRecipe(item) {
-        navigation.navigate('Detail', { id: item.id })
+        navigation.navigate('Detail', { id: item.id, currentUser: route.params.currentUser })
     }
     return <SafeAreaView style={{
         backgroundColor: "orange",
@@ -119,9 +125,28 @@ function MainScreen({ navigation }) {
                 fontStyle: 'italic',
                 //fontFamily: 'Sigmar-Regular'
             }}>DISHES</Text>
-            <View style={{ flex: 0.3 }} />
-
-            <View style={{ flex: 0.05 }} />
+            <View style={{flex:1}}/>
+            <Text style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                color: 'white',
+                marginStart: 110,
+                marginTop: 5,
+                //fontFamily: 'Sigmar-Regular'
+            }}>{route.params.currentUser}</Text>
+            <TouchableOpacity style={{
+                height: 35,
+                width: 35,
+                marginStart: 10,
+                marginEnd: 20
+            }}>
+                <Image source={require('../assets/user.png')}
+                style={{
+                    height: 35,
+                    width: 35,
+                    tintColor: 'white'
+                }}/>
+            </TouchableOpacity>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center' }}>
             <View style={{

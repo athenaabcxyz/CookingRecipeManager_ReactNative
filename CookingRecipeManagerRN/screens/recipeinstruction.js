@@ -13,15 +13,16 @@ import {
     StatusBar,
     Image,
     TouchableOpacity,
-    ScrollView
+    ScrollView,
+    BackHandler
 } from 'react-native'
 
 import { useRoute } from '@react-navigation/native';
 
-const apiKey = "12ac99b1218346a48dce60a6266c7a3a"; //"12ac99b1218346a48dce60a6266c7a3a";
+const apiKey = "e6f3dc1b857f4ad0b84684bcf2da349d"; //"12ac99b1218346a48dce60a6266c7a3a";
 
 function RecipeInstruction({ navigation, route }) {
-    const [currentUser, setCurrentUser] = useState();
+    const currentScreen="Instruction";
     const [loggedin, setloggedin] = useState(false);
     const [id, setid] = useState(route.params.id);
     const [apilink, setapilink] = useState("https://api.spoonacular.com/recipes/" + id + "/information?includeNutrition=true&apiKey=" + apiKey);
@@ -39,7 +40,7 @@ function RecipeInstruction({ navigation, route }) {
             .then(json => {
                 setrecipe(json)
                 setFetching(false)
-  
+
             })
             .catch((error) => {
                 console.error(error);
@@ -48,29 +49,16 @@ function RecipeInstruction({ navigation, route }) {
     }
 
     useEffect(() => {
-        if (route && route.params) {
-            setCurrentUser(route.params.currentUser)
-            setloggedin(true);
-        }
         fetchData();
     }, []);
 
     useEffect(() => {
-        if (route && route.params) {
-            setCurrentUser(route.params.currentUser)
-            setloggedin(true);
-        }
         setapilink("https://api.spoonacular.com/recipes/" + id + "/information?includeNutrition=true&apiKey=" + apiKey)
         fetchData();
     }, [id]);
-    useEffect(()=>{
-        if (route && route.params) {
-            setCurrentUser(route.params.currentUser)
-            setloggedin(true);
-        }
+    useEffect(() => {
         getInstruction(recipe.id)
-    },[recipe])
-
+    }, [recipe])
     const getInstruction = (id) => {
         setGettingInstruction(true)
         fetch("https://api.spoonacular.com/recipes/" + id + "/analyzedInstructions?&apiKey=" + apiKey)
@@ -96,29 +84,37 @@ function RecipeInstruction({ navigation, route }) {
             flexDirection: 'row',
             marginTop: 10,
         }}>
-            {
-                loggedin ? (
-                    <Text style={{
-                        fontSize: 30,
-                        fontWeight: 'bold',
-                        color: 'white',
-                        marginStart: 15,
-                        fontStyle: 'italic',
-                        //fontFamily: 'Sigmar-Regular'
-                    }}>{ currentUser }</Text>
-                ) :
-                (
-                    <Text style={{
-                        fontSize: 30,
-                        fontWeight: 'bold',
-                        color: 'white',
-                        marginStart: 15,
-                        fontStyle: 'italic',
-                        //fontFamily: 'Sigmar-Regular'
-                    }}>Instruction</Text>
-                )
-            }
 
+            <Text style={{
+                fontSize: 30,
+                fontWeight: 'bold',
+                color: 'white',
+                marginStart: 15,
+                fontStyle: 'italic',
+                //fontFamily: 'Sigmar-Regular'
+            }}>Instruction</Text>
+        <View style={{flex:1}}/>
+            <Text style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                color: 'white',
+                marginStart: 110,
+                marginTop: 5,
+                //fontFamily: 'Sigmar-Regular'
+            }}>{route.params.currentUser}</Text>
+            <TouchableOpacity style={{
+                height: 35,
+                width: 35,
+                marginStart: 10,
+                marginEnd: 20
+            }}>
+                <Image source={require('../assets/user.png')}
+                style={{
+                    height: 35,
+                    width: 35,
+                    tintColor: 'white'
+                }}/>
+            </TouchableOpacity>
         </View>
         <View style={{
             height: 5,

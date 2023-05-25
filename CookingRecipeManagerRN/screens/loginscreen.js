@@ -16,6 +16,8 @@ import {
     ScrollView,
     TextInput,
     TouchableHighlight,
+    Dimensions,
+    Alert
 } from 'react-native'
 import * as SQLite from "expo-sqlite";
 import { useRoute } from '@react-navigation/native';
@@ -26,7 +28,6 @@ const db = SQLite.openDatabase('example.db');
 function LoginScreen({ navigation, route }) {
     const [db, setDb] = useState(SQLite.openDatabase('example.db'));
     const [usersdb, setuserdb] = useState([]);
-    const [currentUser, setCurrentUser] = useState();
     const [username, setUsername] = useState();
     const [password, setPassword] = useState();
     const [isLoading, setIsLoading] = useState(true);
@@ -39,18 +40,21 @@ function LoginScreen({ navigation, route }) {
             );
             setIsLoading(false);
         });
-        if (route && route.params) setCurrentUser(route.params.currentUser)
     }, []);
 
     loginCheck = () => {
+        let isloggedin=false;
         for (let userinfo of usersdb) {
             if (username == userinfo.username && password == userinfo.password)
             {
-                setCurrentUser(userinfo.username)
                 console.log(usersdb)
-                navigation.navigate('Instruction', { currentUser: currentUser, id: 716429 })
+                navigation.navigate('Dishes', { currentUser: username})
+                isloggedin=true;
             }
+      
         }
+        if(!isloggedin)
+        Alert.alert('','Username or password is incorrect.\nPlease try again.')
     }
 
     return (<SafeAreaView style={{
@@ -72,67 +76,92 @@ function LoginScreen({ navigation, route }) {
                 //fontFamily: 'Sigmar-Regular'
             }}>Login</Text>
         </View>
+        <View style={{
+            height: 5,
+            backgroundColor: 'white',
+            width: Dimensions.get('window').width,
+            marginTop: 10,
+        }}/>
         <View>
             {isLoading ? (
                 <View>
                     <ActivityIndicator size="large" color="#0000ff" />
                 </View>
             ) : (
-                <View>
+                <View style={{
+                    marginTop: 100,
+                    marginStart: 30,
+                    marginEnd: 50
+                }}>
                         <Text style={{
-                            fontWeight: '400',
-                            fontSize: 20,
+                             fontWeight: '800',
+                             fontSize: 20,
+                             marginStart: 10,
+                             color: 'white'
                         }}>
-                            Username
+                            Username:
                         </Text>
 
                         <TextInput
-                            style={{
-                                backgroundColor: '#d9d9d9',
-                                borderRadius: 5,
-                                marginTop: 20,
-                                marginBottom: 40,
-                                minWidth: 300,
-                            }}
+                            placeholderTextColor={'white'}
+                            placeholder='Type in your username'
+                                style={{
+                                    marginTop: 0,
+                                    color: 'white',
+                                    marginEnd: 10,
+                                    borderBottomWidth: 2,
+                                    borderBottomColor: 'white',
+                                    marginStart: 10,
+                                    minWidth: 300,
+                                }}
                             onChangeText={(text) => setUsername(text)}
                             value={username}   >
                         </TextInput>
 
                         <Text style={{
-                            fontWeight: '400',
-                            fontSize: 20,
+                                fontWeight: '800',
+                                fontSize: 20,
+                                marginStart: 10,
+                                color: 'white',
+                                marginTop: 10
                         }}>
-                            Password
+                            Password:
                         </Text>
 
                         <TextInput
-                            secureTextEntry={true}
-                            style={{
-                                backgroundColor: '#d9d9d9',
-                                borderRadius: 5,
-                                marginTop: 20,
-                                marginBottom: 40,
-                                minWidth: 300,
-                            }}
+                          placeholder='Type in your password'
+                          placeholderTextColor={'white'}
+                              secureTextEntry={true}
+                              style={{
+                                  color: 'white',
+                                  marginTop: 0,
+                                  marginEnd: 10,
+                                  borderBottomWidth: 2,
+                                  borderBottomColor: 'white',
+                                  marginStart: 10,
+                                  minWidth: 300,
+                              }}
                             onChangeText={(text) => setPassword(text)}
                             value={password}>
                         </TextInput>
 
                         <TouchableHighlight style={{
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            alignSelf: 'center',
-                            backgroundColor: '#1FA97C',
-                            width: 100,
-                            height: 40,
-                            marginTop: 20,
-                            borderRadius: 5,
+                             justifyContent: 'center',
+                             alignItems: 'center',
+                             alignSelf: 'center',
+                             borderWidth: 5,
+                             borderColor: 'white',
+                             width: 100,
+                             height: 40,
+                             marginTop: 50,
+                             borderRadius: 8,
                         }}
                             onPress={loginCheck} >
                             <Text style={{
+                                alignSelf: 'center',
                                 color: 'white',
-                                fontSize: 16,
-                                fontWeight: '300',
+                                fontSize: 15,
+                                fontWeight: '500'
                             }}>
                                 LOGIN
                             </Text>

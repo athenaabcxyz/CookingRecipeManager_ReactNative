@@ -16,6 +16,8 @@ import {
     ScrollView,
     TextInput,
     TouchableHighlight,
+    Dimensions,
+    Alert
 } from 'react-native'
 import * as SQLite from "expo-sqlite";
 import { useRoute } from '@react-navigation/native';
@@ -63,8 +65,17 @@ function RegisterScreen({ navigation, route }) {
                 tx.executeSql('INSERT INTO constants (username, password) VALUES (?, ?)', [username, password]);
                 setIsLoading(false);
             });
+            alert('Registration successful! \nPlease continue to login.')
             navigation.navigate('Login')
         }
+        else{
+            Alert.alert('','Username is already existed.')
+            return
+        }
+    }
+
+    const navigateToLogin = () => {
+        navigation.navigate('Login')
     }
 
     return (<SafeAreaView style={{
@@ -86,26 +97,42 @@ function RegisterScreen({ navigation, route }) {
                 //fontFamily: 'Sigmar-Regular'
             }}>Register</Text>
         </View>
+        <View style={{
+            height: 5,
+            backgroundColor: 'white',
+            width: Dimensions.get('window').width,
+            marginTop: 10,
+        }}/>
         <View>
             {isLoading ? (
                 <View>
                     <ActivityIndicator size="large" color="#0000ff" />
                 </View>
             ) : (
-                <View>
+                <View style={{
+                    marginTop: 100,
+                    marginStart: 30,
+                    marginEnd: 50
+                }}>
                         <Text style={{
-                            fontWeight: '400',
+                            fontWeight: '800',
                             fontSize: 20,
+                            marginStart: 10,
+                            color: 'white'
                         }}>
-                            Username
+                            Username:
                         </Text>
 
                         <TextInput
+                        placeholderTextColor={'white'}
+                        placeholder='Type in your username'
                             style={{
-                                backgroundColor: '#d9d9d9',
-                                borderRadius: 5,
-                                marginTop: 20,
-                                marginBottom: 40,
+                                marginTop: 0,
+                                color: 'white',
+                                marginEnd: 10,
+                                borderBottomWidth: 2,
+                                borderBottomColor: 'white',
+                                marginStart: 10,
                                 minWidth: 300,
                             }}
                             onChangeText={(text) => setUsername(text)}
@@ -113,19 +140,26 @@ function RegisterScreen({ navigation, route }) {
                         </TextInput>
 
                         <Text style={{
-                            fontWeight: '400',
+                            fontWeight: '800',
                             fontSize: 20,
+                            marginStart: 10,
+                            color: 'white',
+                            marginTop: 10
                         }}>
-                            Password
+                            Password: 
                         </Text>
 
                         <TextInput
+                        placeholder='Type in your password'
+                        placeholderTextColor={'white'}
                             secureTextEntry={true}
                             style={{
-                                backgroundColor: '#d9d9d9',
-                                borderRadius: 5,
-                                marginTop: 20,
-                                marginBottom: 40,
+                                color: 'white',
+                                marginTop: 0,
+                                marginEnd: 10,
+                                borderBottomWidth: 2,
+                                borderBottomColor: 'white',
+                                marginStart: 10,
                                 minWidth: 300,
                             }}
                             onChangeText={(text) => setPassword(text)}
@@ -136,20 +170,49 @@ function RegisterScreen({ navigation, route }) {
                             justifyContent: 'center',
                             alignItems: 'center',
                             alignSelf: 'center',
-                            backgroundColor: '#1FA97C',
+                            borderWidth: 5,
+                            borderColor: 'white',
                             width: 100,
                             height: 40,
-                            marginTop: 20,
-                            borderRadius: 5,
+                            marginTop: 50,
+                            borderRadius: 8,
                         }}
                             onPress={registerCheck} >
                             <Text style={{
                                 color: 'white',
                                 fontSize: 16,
-                                fontWeight: '300',
+                                fontWeight: '600',
+                                borderRadius: 5
                             }}>
                                 Register
                             </Text>
+                        </TouchableHighlight>
+                        <Text style={{
+                            alignSelf: 'center',
+                            color: 'white',
+                            fontSize: 15,
+                            marginTop: 100,
+                            fontWeight: '500'
+                        }}>Already have account?</Text>
+                        <TouchableHighlight 
+                        onPress={navigateToLogin}
+                        style={{
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            alignSelf: 'center',
+                            borderWidth: 5,
+                            borderColor: 'white',
+                            width: 100,
+                            height: 40,
+                            marginTop: 10,
+                            borderRadius: 8,
+                        }}>
+                            <Text style={{
+                            alignSelf: 'center',
+                            color: 'white',
+                            fontSize: 15,
+                            fontWeight: '500'
+                        }}>Login</Text>
                         </TouchableHighlight>
                 </View>
             )

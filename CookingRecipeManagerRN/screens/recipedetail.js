@@ -13,14 +13,16 @@ import {
     StatusBar,
     Image,
     TouchableOpacity,
-    ScrollView
+    ScrollView,
+    BackHandler
 } from 'react-native'
 
 import { useRoute } from '@react-navigation/native';
 
-const apiKey = "12ac99b1218346a48dce60a6266c7a3a"//"e6f3dc1b857f4ad0b84684bcf2da349d"; //;
+const apiKey = "e6f3dc1b857f4ad0b84684bcf2da349d"//"e6f3dc1b857f4ad0b84684bcf2da349d"; //;
 
 function RecipeDetail({navigation, route}) {
+    const currentScreen="Detail";
     const [id, setid] = useState(route.params.id);
     const [apilink, setapilink] = useState("https://api.spoonacular.com/recipes/"+id+"/information?includeNutrition=true&apiKey=" + apiKey);
     const [isFetching, setFetching] = useState(false);
@@ -32,6 +34,7 @@ function RecipeDetail({navigation, route}) {
     let similarAPI= 'https://api.spoonacular.com/recipes/' + recipe.id + '/similar?apiKey=' + apiKey;
 
     const error = 'There is error while loading. \n (Ｔ▽Ｔ)'
+    
 
     const fetchData = () => {
         setFetching(true);
@@ -64,10 +67,6 @@ function RecipeDetail({navigation, route}) {
         setNutritionChartState(!isNutritionCharShowed);
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
-
     useEffect(()=>{
         fetchData()
     }, [apilink])
@@ -91,7 +90,7 @@ function RecipeDetail({navigation, route}) {
     }, [recipe]);
 
     function viewInstruction(id) {
-        navigation.navigate('Instruction', { id: id })
+        navigation.navigate('Instruction', { id: id, currentUser: route.params.currentUser })
         console.log('recipe: ' + id)
     }
 
@@ -113,7 +112,28 @@ function RecipeDetail({navigation, route}) {
                 fontStyle: 'italic',
                 //fontFamily: 'Sigmar-Regular'
             }}>DETAIL</Text>
-
+        <View style={{flex:1}}/>
+            <Text style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                color: 'white',
+                marginStart: 110,
+                marginTop: 5,
+                //fontFamily: 'Sigmar-Regular'
+            }}>{route.params.currentUser}</Text>
+            <TouchableOpacity style={{
+                height: 35,
+                width: 35,
+                marginStart: 10,
+                marginEnd: 20
+            }}>
+                <Image source={require('../assets/user.png')}
+                style={{
+                    height: 35,
+                    width: 35,
+                    tintColor: 'white'
+                }}/>
+            </TouchableOpacity>
         </View>
         <View style={{
             height: 5,
