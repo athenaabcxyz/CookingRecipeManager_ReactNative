@@ -21,6 +21,8 @@ import { useRoute } from '@react-navigation/native';
 const apiKey = "12ac99b1218346a48dce60a6266c7a3a"; //"12ac99b1218346a48dce60a6266c7a3a";
 
 function RecipeInstruction({ navigation, route }) {
+    const [currentUser, setCurrentUser] = useState();
+    const [loggedin, setloggedin] = useState(false);
     const [id, setid] = useState(route.params.id);
     const [apilink, setapilink] = useState("https://api.spoonacular.com/recipes/" + id + "/information?includeNutrition=true&apiKey=" + apiKey);
     const [isFetching, setFetching] = useState(false);
@@ -35,7 +37,6 @@ function RecipeInstruction({ navigation, route }) {
         fetch(apilink)
             .then(res => res.json())
             .then(json => {
-                console.clear()
                 setrecipe(json)
                 setFetching(false)
   
@@ -47,14 +48,26 @@ function RecipeInstruction({ navigation, route }) {
     }
 
     useEffect(() => {
+        if (route && route.params) {
+            setCurrentUser(route.params.currentUser)
+            setloggedin(true);
+        }
         fetchData();
     }, []);
 
     useEffect(() => {
+        if (route && route.params) {
+            setCurrentUser(route.params.currentUser)
+            setloggedin(true);
+        }
         setapilink("https://api.spoonacular.com/recipes/" + id + "/information?includeNutrition=true&apiKey=" + apiKey)
         fetchData();
     }, [id]);
     useEffect(()=>{
+        if (route && route.params) {
+            setCurrentUser(route.params.currentUser)
+            setloggedin(true);
+        }
         getInstruction(recipe.id)
     },[recipe])
 
@@ -83,14 +96,28 @@ function RecipeInstruction({ navigation, route }) {
             flexDirection: 'row',
             marginTop: 10,
         }}>
-            <Text style={{
-                fontSize: 30,
-                fontWeight: 'bold',
-                color: 'white',
-                marginStart: 15,
-                fontStyle: 'italic',
-                //fontFamily: 'Sigmar-Regular'
-            }}>Instruction</Text>
+            {
+                loggedin ? (
+                    <Text style={{
+                        fontSize: 30,
+                        fontWeight: 'bold',
+                        color: 'white',
+                        marginStart: 15,
+                        fontStyle: 'italic',
+                        //fontFamily: 'Sigmar-Regular'
+                    }}>{ currentUser }</Text>
+                ) :
+                (
+                    <Text style={{
+                        fontSize: 30,
+                        fontWeight: 'bold',
+                        color: 'white',
+                        marginStart: 15,
+                        fontStyle: 'italic',
+                        //fontFamily: 'Sigmar-Regular'
+                    }}>Instruction</Text>
+                )
+            }
 
         </View>
         <View style={{

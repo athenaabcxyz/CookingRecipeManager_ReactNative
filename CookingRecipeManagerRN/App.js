@@ -2,10 +2,13 @@ import { StyleSheet, Text, View } from 'react-native';
 import RecipeDetail from './screens/recipedetail';
 import MainScreen from './screens/mainscreen';
 import RecipeInstruction from './screens/recipeinstruction';
+import LoginScreen from './screens/loginscreen'
+import RegisterScreen from './screens/registerscreen'
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import RecipeItem from './itemComponents/recipeItem';
 import AdvanceSearch from './screens/advanceSearch';
+import React, { useState, useEffect } from 'react';
 
 const Stack = createNativeStackNavigator();
 
@@ -14,7 +17,7 @@ export default function App() {
   return (
       <NavigationContainer>
         <Stack.Navigator 
-        initialRouteName='Dishes'
+        initialRouteName='Register'
         screenOptions={{
           headerShown: false
         }}>
@@ -22,6 +25,8 @@ export default function App() {
           <Stack.Screen name='Detail' component={RecipeDetail}/>
           <Stack.Screen name='Recipe' component={RecipeItem}/>
           <Stack.Screen name='Instruction' component={RecipeInstruction}/>
+          <Stack.Screen name='Login' component={LoginScreen} />
+          <Stack.Screen name='Register' component={RegisterScreen} />
         </Stack.Navigator>
       </NavigationContainer>
   );
