@@ -22,56 +22,67 @@ import {
 import * as SQLite from "expo-sqlite";
 import { useRoute } from '@react-navigation/native';
 
+import { initializeApp } from "firebase/app";
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { getFirestore } from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore"; 
+import app from '../components/firebaseConfig';
+const auth = getAuth(app);
+const db = getFirestore(app);
+
 const apiKey = "12ac99b1218346a48dce60a6266c7a3a"; //"12ac99b1218346a48dce60a6266c7a3a";
-const db = SQLite.openDatabase('example.db');
 
 function RegisterScreen({ navigation, route }) {
-    const [db, setDb] = useState(SQLite.openDatabase('example.db'));
-    const [usersdb, setuserdb] = useState([]);
-    const [username, setUsername] = useState();
-    const [password, setPassword] = useState();
-    const [isLoading, setIsLoading] = useState(true);
+    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [rePassm, setRePass] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const error = 'There is error while loading. \n (Ｔ▽Ｔ)'
-
-    useEffect(() => {
-        db.transaction(tx => {
-            tx.executeSql(
-                'DROP TABLE IF EXISTS constants;'
-            );
-            tx.executeSql(
-                'CREATE TABLE IF NOT EXISTS constants (userid INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, password TEXT);'
-            );
-            tx.executeSql('INSERT INTO constants (username, password) VALUES (?, ?)', ['admin', '123456']);
-            tx.executeSql('INSERT INTO constants (username, password) VALUES (?, ?)', ['ndmt', '123456']);
-            tx.executeSql('SELECT * FROM constants', [], (_, { rows }) =>
-                setuserdb(rows._array)
-            );
-            setIsLoading(false);
-        });
-    }, []);
-
     registerCheck = () => {
-        let check = false;
-        for (let userinfo of usersdb) {
-            if (username == userinfo.username)
-            {
-                check = true;
+        if (email == "" || password == "" || rePassm == ""||username=="")
+            Alert.alert('', 'Please input all required information');
+        else {
+            if (rePassm != password) {
+                Alert.alert('', 'Password did not match. Please try again.')
             }
+            else {
+                createUserWithEmailAndPassword(auth, email, password)
+                    .then((userCredential) => {
+                        // Signed in 
+                        const user = userCredential.user;
+                        AddUser(user)
+                        Alert.alert('', 'Registration successful! \nPlease continue to login.')
+                        navigation.navigate('Login')
+                        // ...
+                    })
+                    .catch((error) => {
+                        const errorCode = error.code;
+                        const errorMessage = error.message;
+                        Alert.alert('', errorMessage)
+                        // ..
+                    });
+
+            }
+
         }
-        if (check == false)
-        {
-            console.log(check)
-            db.transaction(tx => {
-                tx.executeSql('INSERT INTO constants (username, password) VALUES (?, ?)', [username, password]);
-                setIsLoading(false);
+    }
+
+    async function AddUser(user)
+    {
+        try {
+            const docRef = await addDoc(collection(db, "users"), {
+              username: username,
+              email: email,
+              uid: user.uid,
+              history:[],
+              library:[]
             });
-            alert('Registration successful! \nPlease continue to login.')
-            navigation.navigate('Login')
-        }
-        else{
-            Alert.alert('','Username is already existed.')
-            return
-        }
+          } catch (e) {
+            console.error("Error adding document: ", e);
+          }
+
+
     }
 
     const navigateToLogin = () => {
@@ -102,7 +113,7 @@ function RegisterScreen({ navigation, route }) {
             backgroundColor: 'white',
             width: Dimensions.get('window').width,
             marginTop: 10,
-        }}/>
+        }} />
         <View>
             {isLoading ? (
                 <View>
@@ -114,87 +125,139 @@ function RegisterScreen({ navigation, route }) {
                     marginStart: 30,
                     marginEnd: 50
                 }}>
-                        <Text style={{
-                            fontWeight: '800',
-                            fontSize: 20,
-                            marginStart: 10,
-                            color: 'white'
-                        }}>
-                            Username:
-                        </Text>
+                     <Text style={{
+                        fontWeight: '800',
+                        fontSize: 20,
+                        marginStart: 10,
+                        marginTop: 10,
+                        color: 'white'
+                    }}>
+                        Username:
+                    </Text>
 
-                        <TextInput
+                    <TextInput
                         placeholderTextColor={'white'}
                         placeholder='Type in your username'
-                            style={{
-                                marginTop: 0,
-                                color: 'white',
-                                marginEnd: 10,
-                                borderBottomWidth: 2,
-                                borderBottomColor: 'white',
-                                marginStart: 10,
-                                minWidth: 300,
-                            }}
-                            onChangeText={(text) => setUsername(text)}
-                            value={username}   >
-                        </TextInput>
-
-                        <Text style={{
-                            fontWeight: '800',
-                            fontSize: 20,
-                            marginStart: 10,
+                        style={{
+                            marginTop: 0,
                             color: 'white',
-                            marginTop: 10
-                        }}>
-                            Password: 
-                        </Text>
+                            marginEnd: 10,
+                            borderBottomWidth: 2,
+                            borderBottomColor: 'white',
+                            marginStart: 10,
+                            minWidth: 300,
+                        }}
+                        onChangeText={(text) => setUsername(text)}
+                        value={username}   >
+                    </TextInput>
+                    <Text style={{
+                        fontWeight: '800',
+                        fontSize: 20,
+                        marginStart: 10,
+                        marginTop:10,
+                        color: 'white'
+                    }}>
+                        Email:
+                    </Text>
 
-                        <TextInput
+                    <TextInput
+                        placeholderTextColor={'white'}
+                        placeholder='Type in your email'
+                        style={{
+                            marginTop: 0,
+                            color: 'white',
+                            marginEnd: 10,
+                            borderBottomWidth: 2,
+                            borderBottomColor: 'white',
+                            marginStart: 10,
+                            minWidth: 300,
+                        }}
+                        onChangeText={(text) => setEmail(text)}
+                        value={email}   >
+                    </TextInput>
+
+                    <Text style={{
+                        fontWeight: '800',
+                        fontSize: 20,
+                        marginStart: 10,
+                        color: 'white',
+                        marginTop: 10
+                    }}>
+                        Password:
+                    </Text>
+
+                    <TextInput
                         placeholder='Type in your password'
                         placeholderTextColor={'white'}
-                            secureTextEntry={true}
-                            style={{
-                                color: 'white',
-                                marginTop: 0,
-                                marginEnd: 10,
-                                borderBottomWidth: 2,
-                                borderBottomColor: 'white',
-                                marginStart: 10,
-                                minWidth: 300,
-                            }}
-                            onChangeText={(text) => setPassword(text)}
-                            value={password}>
-                        </TextInput>
-
-                        <TouchableHighlight style={{
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            alignSelf: 'center',
-                            borderWidth: 5,
-                            borderColor: 'white',
-                            width: 100,
-                            height: 40,
-                            marginTop: 50,
-                            borderRadius: 8,
-                        }}
-                            onPress={registerCheck} >
-                            <Text style={{
-                                color: 'white',
-                                fontSize: 16,
-                                fontWeight: '600',
-                                borderRadius: 5
-                            }}>
-                                Register
-                            </Text>
-                        </TouchableHighlight>
-                        <Text style={{
-                            alignSelf: 'center',
+                        secureTextEntry={true}
+                        style={{
                             color: 'white',
-                            fontSize: 15,
-                            marginTop: 100,
-                            fontWeight: '500'
-                        }}>Already have account?</Text>
-                        <TouchableHighlight 
+                            marginTop: 0,
+                            marginEnd: 10,
+                            borderBottomWidth: 2,
+                            borderBottomColor: 'white',
+                            marginStart: 10,
+                            minWidth: 300,
+                        }}
+                        onChangeText={(text) => setPassword(text)}
+                        value={password}>
+                    </TextInput>
+                    <Text style={{
+                        fontWeight: '800',
+                        fontSize: 20,
+                        marginStart: 10,
+                        color: 'white',
+                        marginTop: 10
+                    }}>
+                        Retype Password:
+                    </Text>
+                    <TextInput
+                        placeholder='Type in your password'
+                        placeholderTextColor={'white'}
+                        secureTextEntry={true}
+                        style={{
+                            color: 'white',
+                            marginTop: 0,
+                            marginEnd: 10,
+                            borderBottomWidth: 2,
+                            borderBottomColor: 'white',
+                            marginStart: 10,
+                            minWidth: 300,
+                        }}
+                        onChangeText={(text) => setRePass(text)}
+                        value={rePassm}>
+                    </TextInput>
+
+
+                    <TouchableHighlight style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        alignSelf: 'center',
+                        borderWidth: 5,
+                        borderColor: 'white',
+                        width: 100,
+                        height: 40,
+                        marginTop: 50,
+                        borderRadius: 8,
+                    }}
+                        onPress={registerCheck} >
+                        <Text style={{
+                            color: 'white',
+                            fontSize: 16,
+                            fontWeight: '600',
+                            borderRadius: 5
+                        }}>
+                            Register
+                        </Text>
+                    </TouchableHighlight>
+                    <Text style={{
+                        alignSelf: 'center',
+                        color: 'white',
+                        fontSize: 15,
+                        marginTop: 100,
+                        fontWeight: '500'
+                    }}>Already have account?</Text>
+                    <TouchableHighlight
                         onPress={navigateToLogin}
                         style={{
                             justifyContent: 'center',
@@ -207,13 +270,13 @@ function RegisterScreen({ navigation, route }) {
                             marginTop: 10,
                             borderRadius: 8,
                         }}>
-                            <Text style={{
+                        <Text style={{
                             alignSelf: 'center',
                             color: 'white',
                             fontSize: 15,
                             fontWeight: '500'
                         }}>Login</Text>
-                        </TouchableHighlight>
+                    </TouchableHighlight>
                 </View>
             )
             }

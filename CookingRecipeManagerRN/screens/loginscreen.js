@@ -21,40 +21,41 @@ import {
 } from 'react-native'
 import * as SQLite from "expo-sqlite";
 import { useRoute } from '@react-navigation/native';
+import app from '../components/firebaseConfig';
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+const auth = getAuth(app);
+
 
 const apiKey = "12ac99b1218346a48dce60a6266c7a3a"; //"12ac99b1218346a48dce60a6266c7a3a";
-const db = SQLite.openDatabase('example.db');
 
 function LoginScreen({ navigation, route }) {
-    const [db, setDb] = useState(SQLite.openDatabase('example.db'));
-    const [usersdb, setuserdb] = useState([]);
-    const [username, setUsername] = useState();
+    const [email, setEmail] = useState();
     const [password, setPassword] = useState();
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const error = 'There is error while loading. \n (Ｔ▽Ｔ)'
 
-    useEffect(() => {
-        db.transaction(tx => {
-            tx.executeSql('SELECT * FROM constants', [], (_, { rows }) =>
-                setuserdb(rows._array)
-            );
-            setIsLoading(false);
-        });
-    }, []);
+    toRegister = () => {
+        navigation.navigate('Register')
+    }
 
     loginCheck = () => {
-        let isloggedin=false;
-        for (let userinfo of usersdb) {
-            if (username == userinfo.username && password == userinfo.password)
-            {
-                console.log(usersdb)
-                navigation.navigate('Dishes', { currentUser: username})
-                isloggedin=true;
-            }
-      
-        }
-        if(!isloggedin)
-        Alert.alert('','Username or password is incorrect.\nPlease try again.')
+        setIsLoading(true)
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Signed in 
+                const user = userCredential.user;
+                navigation.navigate('Dishes', { currentUser: user })
+                setIsLoading(false)
+                // ...
+            })
+            .catch((error) => {
+                setIsLoading(false)
+                Alert.alert('', errorMessage)
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorMessage)
+            });
+
     }
 
     return (<SafeAreaView style={{
@@ -81,7 +82,7 @@ function LoginScreen({ navigation, route }) {
             backgroundColor: 'white',
             width: Dimensions.get('window').width,
             marginTop: 10,
-        }}/>
+        }} />
         <View>
             {isLoading ? (
                 <View>
@@ -93,79 +94,111 @@ function LoginScreen({ navigation, route }) {
                     marginStart: 30,
                     marginEnd: 50
                 }}>
-                        <Text style={{
-                             fontWeight: '800',
-                             fontSize: 20,
-                             marginStart: 10,
-                             color: 'white'
-                        }}>
-                            Username:
-                        </Text>
+                    <Text style={{
+                        fontWeight: '800',
+                        fontSize: 20,
+                        marginStart: 10,
+                        color: 'white'
+                    }}>
+                        Email:
+                    </Text>
 
-                        <TextInput
-                            placeholderTextColor={'white'}
-                            placeholder='Type in your username'
-                                style={{
-                                    marginTop: 0,
-                                    color: 'white',
-                                    marginEnd: 10,
-                                    borderBottomWidth: 2,
-                                    borderBottomColor: 'white',
-                                    marginStart: 10,
-                                    minWidth: 300,
-                                }}
-                            onChangeText={(text) => setUsername(text)}
-                            value={username}   >
-                        </TextInput>
-
-                        <Text style={{
-                                fontWeight: '800',
-                                fontSize: 20,
-                                marginStart: 10,
-                                color: 'white',
-                                marginTop: 10
-                        }}>
-                            Password:
-                        </Text>
-
-                        <TextInput
-                          placeholder='Type in your password'
-                          placeholderTextColor={'white'}
-                              secureTextEntry={true}
-                              style={{
-                                  color: 'white',
-                                  marginTop: 0,
-                                  marginEnd: 10,
-                                  borderBottomWidth: 2,
-                                  borderBottomColor: 'white',
-                                  marginStart: 10,
-                                  minWidth: 300,
-                              }}
-                            onChangeText={(text) => setPassword(text)}
-                            value={password}>
-                        </TextInput>
-
-                        <TouchableHighlight style={{
-                             justifyContent: 'center',
-                             alignItems: 'center',
-                             alignSelf: 'center',
-                             borderWidth: 5,
-                             borderColor: 'white',
-                             width: 100,
-                             height: 40,
-                             marginTop: 50,
-                             borderRadius: 8,
+                    <TextInput
+                        placeholderTextColor={'white'}
+                        placeholder='Type in your email'
+                        style={{
+                            marginTop: 0,
+                            color: 'white',
+                            marginEnd: 10,
+                            borderBottomWidth: 2,
+                            borderBottomColor: 'white',
+                            marginStart: 10,
+                            minWidth: 300,
                         }}
-                            onPress={loginCheck} >
-                            <Text style={{
-                                alignSelf: 'center',
-                                color: 'white',
-                                fontSize: 15,
-                                fontWeight: '500'
-                            }}>
-                                LOGIN
-                            </Text>
-                        </TouchableHighlight>
+                        
+                        onChangeText={(text) => setEmail(text)}
+                        value={email}   >
+                    </TextInput>
+
+                    <Text style={{
+                        fontWeight: '800',
+                        fontSize: 20,
+                        marginStart: 10,
+                        color: 'white',
+                        marginTop: 10
+                    }}>
+                        Password:
+                    </Text>
+
+                    <TextInput
+                        placeholder='Type in your password'
+                        placeholderTextColor={'white'}
+                        secureTextEntry={true}
+                        style={{
+                            color: 'white',
+                            marginTop: 0,
+                            marginEnd: 10,
+                            borderBottomWidth: 2,
+                            borderBottomColor: 'white',
+                            marginStart: 10,
+                            minWidth: 300,
+                        }}
+                        onChangeText={(text) => setPassword(text)}
+                        value={password}>
+                    </TextInput>
+
+                    <TouchableHighlight style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        alignSelf: 'center',
+                        borderWidth: 5,
+                        borderColor: 'white',
+                        width: 100,
+                        height: 40,
+                        marginTop: 50,
+                        borderRadius: 8,
+                    }}
+                        onPress={loginCheck} >
+                        <Text style={{
+                            alignSelf: 'center',
+                            color: 'white',
+                            fontSize: 15,
+                            fontWeight: '500'
+                        }}>
+                            LOGIN
+                        </Text>
+                    </TouchableHighlight>
+
+                    <Text style={{
+                        color: 'white',
+                        textAlign: 'center',
+                        marginTop: 20,
+                        fontSize: 15,
+                        fontWeight: 'bold'
+                    }}>Don't have account?</Text>
+
+                    <TouchableHighlight style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        alignSelf: 'center',
+                        borderWidth: 5,
+                        borderColor: 'white',
+                        width: 100,
+                        height: 40,
+                        marginTop: 10,
+                        borderRadius: 8,
+                    }}
+                        onPress={toRegister} >
+                        <Text style={{
+                            alignSelf: 'center',
+                            color: 'white',
+                            fontSize: 15,
+                            fontWeight: '500'
+                        }}>
+                            Register
+                        </Text>
+                    </TouchableHighlight>
+
                 </View>
             )
             }

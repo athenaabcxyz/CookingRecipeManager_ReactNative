@@ -15,19 +15,25 @@ import {
     Image,
     BackHandler
 } from 'react-native'
-import Modal from 'react-native-modal';
-import { useRoute } from '@react-navigation/native';
+import * as SQLite from "expo-sqlite";
 
-const apiKey = "e6f3dc1b857f4ad0b84684bcf2da349d";
+import { initializeApp } from "firebase/app";
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { getFirestore } from "firebase/firestore";
+import app from '../components/firebaseConfig';
+import { collection, query, where, getDocs, updateDoc,arrayUnion } from "firebase/firestore";
 
+const db = getFirestore(app);
+
+const apiKey = "12ac99b1218346a48dce60a6266c7a3a";
 function MainScreen({ navigation, route }) {
-
     const Stack = createNativeStackNavigator();
-    const currentScreen="Dishes";
+    const currentScreen = "Dishes";
     <Stack.Screen name='RecipeItem' component={RecipeItem} />
     const [search, setSearch] = useState("");
     const [recipes, setrecipes] = useState([]);
     const [currentUser, setCurrentUser] = useState(route.params.currentUser)
+    const [currentUserData, setCurrentUserData] = useState();
     const [apilink, setapilink] = useState("https://api.spoonacular.com/recipes/random?number=20&apiKey=" + apiKey + "&tags=");
     const [isFetching, setFetching] = useState(false);
     const [dataLength, setDataLength] = useState(1);
@@ -41,7 +47,9 @@ function MainScreen({ navigation, route }) {
 
     const sorry = 'There is no result (Ｔ▽Ｔ).'
 
-    const fetchData = () => {
+
+
+    const fetchData = async () => {
         setFetching(true);
         fetch(apilink)
             .then(res => res.json())
@@ -52,11 +60,16 @@ function MainScreen({ navigation, route }) {
                 console.error(error);
                 setFetching(false)
             })
+           
     }
 
-    useEffect(() => {
-        fetchData();
-        console.log('Current User: '+route.params.currentUser)
+    useEffect(async () => {
+        const q = query(collection(db, "users"), where("uid", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            setCurrentUserData(doc.data())
+        });
+      
     }, []);
     useEffect(() => {
         fetchData()
@@ -103,9 +116,24 @@ function MainScreen({ navigation, route }) {
                 })
         }
     }
+    function toUser(){
+        navigation.navigate('User', { currentUser: currentUserData })
+    }
+    async function SaveToHistory(id) {
+        console.log(id)
+        const q = query(collection(db, "users"), where("uid", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach(async (doc) => {
+            await updateDoc(doc, {
+                history: arrayUnion(String(id))
+            });
+            
+        });
+    }
 
     function selectRecipe(item) {
-        navigation.navigate('Detail', { id: item.id, currentUser: route.params.currentUser })
+        SaveToHistory(item.id)
+        navigation.navigate('Detail', { id: item.id, currentUser: currentUserData })
     }
     return <SafeAreaView style={{
         backgroundColor: "orange",
@@ -125,7 +153,7 @@ function MainScreen({ navigation, route }) {
                 fontStyle: 'italic',
                 //fontFamily: 'Sigmar-Regular'
             }}>DISHES</Text>
-            <View style={{flex:1}}/>
+            <View style={{ flex: 1 }} />
             <Text style={{
                 fontSize: 20,
                 fontWeight: 'bold',
@@ -133,19 +161,21 @@ function MainScreen({ navigation, route }) {
                 marginStart: 110,
                 marginTop: 5,
                 //fontFamily: 'Sigmar-Regular'
-            }}>{route.params.currentUser}</Text>
-            <TouchableOpacity style={{
+            }}>{currentUserData ? (currentUserData.username) : "Guest"}</Text>
+            <TouchableOpacity 
+            onPress={toUser}
+            style={{
                 height: 35,
                 width: 35,
                 marginStart: 10,
                 marginEnd: 20
             }}>
                 <Image source={require('../assets/user.png')}
-                style={{
-                    height: 35,
-                    width: 35,
-                    tintColor: 'white'
-                }}/>
+                    style={{
+                        height: 35,
+                        width: 35,
+                        tintColor: 'white'
+                    }} />
             </TouchableOpacity>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center' }}>

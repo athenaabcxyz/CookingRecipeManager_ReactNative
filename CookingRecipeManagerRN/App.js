@@ -7,20 +7,24 @@ import RegisterScreen from './screens/registerscreen'
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import RecipeItem from './itemComponents/recipeItem';
-import AdvanceSearch from './screens/advanceSearch';
 import React, { useState, useEffect } from 'react';
+import User from './screens/userscreen';
+
 
 const Stack = createNativeStackNavigator();
 
 
 export default function App() {
+  
   return (
+
       <NavigationContainer>
         <Stack.Navigator 
-        initialRouteName='Register'
+        initialRouteName='Login'
         screenOptions={{
           headerShown: false
         }}>
+          <Stack.Screen name='User' component={User}/>
           <Stack.Screen name='Dishes' component={MainScreen}/>
           <Stack.Screen name='Detail' component={RecipeDetail}/>
           <Stack.Screen name='Recipe' component={RecipeItem}/>

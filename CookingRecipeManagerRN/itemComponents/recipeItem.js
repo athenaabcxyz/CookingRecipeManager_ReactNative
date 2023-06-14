@@ -15,13 +15,14 @@ import TextTicker from 'react-native-text-ticker';
 function RecipeItem({ item, onPress }) {
 
     let dishTypeList = '';
+    let cuisinesList = '';
 
+    if(typeof(item)!='undefined')
+    {
     item.dishTypes.forEach(element => {
         dishTypeList = dishTypeList + element + ", ";
     });
     dishTypeList = dishTypeList.substring(0, dishTypeList.length - 2);
-
-    let cuisinesList = '';
 
     item.cuisines.forEach(element => {
         cuisinesList = cuisinesList + element + ", ";
@@ -33,6 +34,7 @@ function RecipeItem({ item, onPress }) {
 
     if (dishTypeList.length <= 0)
         dishTypeList = 'uncategoried';
+}
 
     return (
         <TouchableOpacity

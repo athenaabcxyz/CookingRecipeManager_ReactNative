@@ -19,7 +19,7 @@ import {
 
 import { useRoute } from '@react-navigation/native';
 
-const apiKey = "e6f3dc1b857f4ad0b84684bcf2da349d"//"e6f3dc1b857f4ad0b84684bcf2da349d"; //;
+const apiKey = "12ac99b1218346a48dce60a6266c7a3a"//"e6f3dc1b857f4ad0b84684bcf2da349d"; //;
 
 function RecipeDetail({navigation, route}) {
     const currentScreen="Detail";
@@ -44,7 +44,6 @@ function RecipeDetail({navigation, route}) {
             .then(json => {
                 setrecipe(json)
                 setFetching(false)
-                console.log("recipe id: "+recipe.id)
             })
             .catch((error) => {
                 console.error(error);
@@ -80,7 +79,6 @@ function RecipeDetail({navigation, route}) {
         .then(json2 => {
             setsimilarRecipe(json2)
             setFetching2(false);
-            console.log('data: ' +json2)
         })
         .catch((error) => {
 
@@ -90,8 +88,7 @@ function RecipeDetail({navigation, route}) {
     }, [recipe]);
 
     function viewInstruction(id) {
-        navigation.navigate('Instruction', { id: id, currentUser: route.params.currentUser })
-        console.log('recipe: ' + id)
+        navigation.navigate('Instruction', { id: id, currentUser: route.params.currentUser.username })
     }
 
     return (<SafeAreaView style={{
@@ -120,7 +117,7 @@ function RecipeDetail({navigation, route}) {
                 marginStart: 110,
                 marginTop: 5,
                 //fontFamily: 'Sigmar-Regular'
-            }}>{route.params.currentUser}</Text>
+            }}>{route.params.currentUser.username}</Text>
             <TouchableOpacity style={{
                 height: 35,
                 width: 35,
@@ -156,7 +153,7 @@ function RecipeDetail({navigation, route}) {
                         resizeMode: 'stretch',
                     }}
                     source={{
-                        uri: 'https://api.spoonacular.com/food/menuItems/'+recipe.id+'/nutritionLabel.png/?apiKey='+apiKey
+                        uri: 'https://api.spoonacular.com/recipes/'+recipe.id+'/nutritionLabel.png/?apiKey='+apiKey
                     }} />
             </TouchableOpacity>
         </Modal>
