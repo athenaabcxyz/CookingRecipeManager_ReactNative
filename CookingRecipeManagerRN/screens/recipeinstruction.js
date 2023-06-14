@@ -23,6 +23,7 @@ const apiKey = "e6f3dc1b857f4ad0b84684bcf2da349d"; //"12ac99b1218346a48dce60a626
 
 function RecipeInstruction({ navigation, route }) {
     const currentScreen="Instruction";
+    const [user, setUser] = useState(route.params.currentUser)
     const [loggedin, setloggedin] = useState(false);
     const [id, setid] = useState(route.params.id);
     const [apilink, setapilink] = useState("https://api.spoonacular.com/recipes/" + id + "/information?includeNutrition=true&apiKey=" + apiKey);
@@ -101,7 +102,7 @@ function RecipeInstruction({ navigation, route }) {
                 marginStart: 110,
                 marginTop: 5,
                 //fontFamily: 'Sigmar-Regular'
-            }}>{route.params.currentUser}</Text>
+            }}>{user.username}</Text>
             <TouchableOpacity style={{
                 height: 35,
                 width: 35,

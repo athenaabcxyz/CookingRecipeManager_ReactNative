@@ -17,6 +17,12 @@ import {
     BackHandler
 } from 'react-native'
 
+import app from '../components/firebaseConfig';
+import { Firestore, arrayRemove, getFirestore } from "firebase/firestore";
+import { collection, query, where, getDocs, updateDoc,arrayUnion, doc } from "firebase/firestore";
+
+const db = getFirestore(app);
+
 import { useRoute } from '@react-navigation/native';
 
 const apiKey = "12ac99b1218346a48dce60a6266c7a3a"//"e6f3dc1b857f4ad0b84684bcf2da349d"; //;
@@ -24,6 +30,8 @@ const apiKey = "12ac99b1218346a48dce60a6266c7a3a"//"e6f3dc1b857f4ad0b84684bcf2da
 function RecipeDetail({navigation, route}) {
     const currentScreen="Detail";
     const [id, setid] = useState(route.params.id);
+    const [isSaved, setSaved] = useState(false);
+    const [user, setuser] = useState(route.params.currentUser)
     const [apilink, setapilink] = useState("https://api.spoonacular.com/recipes/"+id+"/information?includeNutrition=true&apiKey=" + apiKey);
     const [isFetching, setFetching] = useState(false);
     const [isNutritionCharShowed, setNutritionChartState] = useState(false);
@@ -62,9 +70,47 @@ function RecipeDetail({navigation, route}) {
         }
     }
 
+    async function savetolibrary(id){
+        const docRef = doc(db, "users", user.uid);
+        // Atomically add a new region to the "regions" array field.
+        await updateDoc(docRef, {
+            library: arrayUnion(id)
+        });
+        setSaved(true)
+        updateUser()
+    }
+
+    async function removefromlibrary(id){
+        const docRef = doc(db, "users", user.uid);
+        // Atomically add a new region to the "regions" array field.
+        await updateDoc(docRef, {
+            library: arrayRemove(id)
+        });
+        setSaved(false)
+        updateUser()
+    }
+
     const toggleNutritionChart = () => {
         setNutritionChartState(!isNutritionCharShowed);
     };
+
+    async function updateUser(){
+        const q = query(collection(db, "users"), where("uid", "==", currentUser.uid));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            setuser(doc.data())
+        });
+      
+    }
+
+    useEffect(() => {
+        if (typeof (user.library) != "undefined") {
+            user.library.forEach(element => {
+                if(element==id)
+                setSaved(true)
+            });
+        }
+    }, [user])
 
     useEffect(()=>{
         fetchData()
@@ -88,7 +134,7 @@ function RecipeDetail({navigation, route}) {
     }, [recipe]);
 
     function viewInstruction(id) {
-        navigation.navigate('Instruction', { id: id, currentUser: route.params.currentUser.username })
+        navigation.navigate('Instruction', { id: id, currentUser: user })
     }
 
     return (<SafeAreaView style={{
@@ -302,6 +348,32 @@ function RecipeDetail({navigation, route}) {
                             color: 'white'
                         }}>
                             View Instructions</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        onPress={event =>{
+                            if(isSaved)
+                            removefromlibrary(recipe);
+                            else
+                            savetolibrary(recipe)
+                        }}
+                        style={{
+                            borderWidth: 5,
+                            borderColor: 'white',
+                            borderRadius: 10,
+                            backgroundColor: 'orange',
+                            height: 50,
+                            width: 200,
+                            justifyContent: 'center',
+                            marginTop: 10,
+                        }}>
+                        <Text style={{
+                            textAlign: 'center',
+                            fontSize: 15,
+                            fontWeight: 'bold',
+                            borderRadius: 10,
+                            color: 'white'
+                        }}>
+                            {isSaved?"Remove from library":"Save to library"}</Text>
                     </TouchableOpacity>
                 </View>
                 <View style={{

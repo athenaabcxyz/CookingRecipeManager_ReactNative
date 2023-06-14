@@ -17,24 +17,27 @@ function RecipeItem({ item, onPress }) {
     let dishTypeList = '';
     let cuisinesList = '';
 
-    if(typeof(item)!='undefined')
+    if (item.dishTypes != undefined)
     {
-    item.dishTypes.forEach(element => {
-        dishTypeList = dishTypeList + element + ", ";
-    });
+        item.dishTypes.forEach(element => {
+            dishTypeList = dishTypeList + element + ", ";
+        });
     dishTypeList = dishTypeList.substring(0, dishTypeList.length - 2);
+    }
 
+    if(item.cuisines!=undefined)
+    {
     item.cuisines.forEach(element => {
         cuisinesList = cuisinesList + element + ", ";
     });
     cuisinesList = cuisinesList.substring(0, cuisinesList.length - 2);
+}
 
     if (cuisinesList.length <= 0)
         cuisinesList = 'Uncategoried';
 
     if (dishTypeList.length <= 0)
         dishTypeList = 'uncategoried';
-}
 
     return (
         <TouchableOpacity

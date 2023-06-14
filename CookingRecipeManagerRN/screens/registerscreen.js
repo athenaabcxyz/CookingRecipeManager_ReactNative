@@ -25,7 +25,7 @@ import { useRoute } from '@react-navigation/native';
 import { initializeApp } from "firebase/app";
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { getFirestore } from "firebase/firestore";
-import { collection, addDoc } from "firebase/firestore"; 
+import { collection, addDoc, setDoc, doc } from "firebase/firestore"; 
 import app from '../components/firebaseConfig';
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -71,7 +71,7 @@ function RegisterScreen({ navigation, route }) {
     async function AddUser(user)
     {
         try {
-            const docRef = await addDoc(collection(db, "users"), {
+            await setDoc(doc(db, "users",user.uid), {
               username: username,
               email: email,
               uid: user.uid,

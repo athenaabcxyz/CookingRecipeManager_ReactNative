@@ -19,16 +19,20 @@ import {
     BackHandler, Dimensions,
     TextView
 } from 'react-native'
-import * as SQLite from "expo-sqlite";
-import { useRoute } from '@react-navigation/native';
 
-const apiKey = "12ac99b1218346a48dce60a6266c7a3a"//"e6f3dc1b857f4ad0b84684bcf2da349d"; //;
+import { useRoute } from '@react-navigation/native';
+import { Firestore, arrayRemove, getFirestore } from "firebase/firestore";
+import app from '../components/firebaseConfig';
+import { collection, query, where, getDocs, updateDoc,arrayUnion, doc, getDoc} from "firebase/firestore";
+
+const db = getFirestore(app);
+
+const apiKey = "e6f3dc1b857f4ad0b84684bcf2da349d"; //"12ac99b1218346a48dce60a6266c7a3a";
 
 
 function User({ navigation, route }) {
     const currentScreen = "User";
-    const [currentUser, setCurrentUser] = useState(route.params.currentUser)
-    const [db, setDb] = useState(SQLite.openDatabase('example.db'));
+    const [user, setUser] = useState(route.params.currentUser)
     const [historyData, setHistoryData] = useState([]);
     const [libraryData, setLibraryData] = useState([]);
     const [isChangePasswordShowed, setChangePasswordShowing] = useState(false);
@@ -37,86 +41,31 @@ function User({ navigation, route }) {
     const [library, setLibrary] = useState([]);
 
 
-    const onRefresh = React.useCallback(() => {
-        fetchData()
-    }, []);
-
     const toggleChangePassword = () => {
         setNutritionChartState(!isNutritionCharShowed);
     };
-    const fetchData = () => {
-        getHistory();
-        getLibrary();
-    }
 
-    useEffect(() => {
-        fetchData()
-    }, [libraryData])
+    useEffect(()=>{
+        setHistory(user.history)
+        setLibrary(user.library)
+    },[user])
 
-    useEffect(() => {
-        db.transaction(tx => {
-            tx.executeSql('SELECT * FROM history', [], (_, { rows }) =>
-                setHistoryData(rows._array)
-            );
+    async function SaveToHistory(id) {
+        const docRef = doc(db, "users", user.uid);
 
+        // Atomically add a new region to the "regions" array field.
+        await updateDoc(docRef, {
+            history: arrayRemove(id)
         });
-        db.transaction(tx => {
-            tx.executeSql('SELECT * FROM library', [], (_, { rows }) =>
-                setLibraryData(rows._array)
-            );
-            setFetching(false);
-        });
-    }, []);
-
-    const getLibrary = () => {
-        if (typeof (libraryData) != "undefined") {
-            for (let library of libraryData) {
-                if (library.username == currentUser) {
-                    fetch("https://api.spoonacular.com/recipes/" + library.recipeId + "/information?apiKey=" + apiKey)
-                        .then(res => res.json())
-                        .then(json => {
-                            setLibrary(current => [...current, json])
-                        })
-                        .catch((error) => {
-                            console.error(error);
-                            setFetching(false)
-                        })
-                }
-
-            }
-        }
-
-    }
-
-    function SaveToHistory(id) {
-        db.transaction(tx => {
-            tx.executeSql('If Not Exists(select * from history where recipeId=? and username = ?) Begin insert into history (username, recipeId) values (?,?) End', [id, route.params.currentUser, route.params.currentUser, id]);
+        await updateDoc(docRef, {
+            history: arrayUnion(id)
         });
     }
-
     function selectRecipe(item) {
-        SaveToHistory(item.id)
-        navigation.navigate('Detail', { id: item.id, currentUser: route.params.currentUser })
+        SaveToHistory(item)
+        navigation.navigate('Detail', { id: item.id, currentUser: user })
     }
 
-    const getHistory = () => {
-        if (typeof (historyData) != "undefined") {
-            for (let history of historyData) {
-                if (history.username == currentUser) {
-                    fetch("https://api.spoonacular.com/recipes/" + history.recipeId + "/information?apiKey=" + apiKey)
-                        .then(res => res.json())
-                        .then(json => {
-                            setLibrary(current => [...current, json])
-                        })
-                        .catch((error) => {
-                            console.error(error);
-                            setFetching(false)
-                        })
-                }
-
-            }
-        }
-    }
     return (<SafeAreaView style={{
         backgroundColor: "orange",
         justifyContent: 'flex-start',
@@ -144,7 +93,7 @@ function User({ navigation, route }) {
                 marginTop: 5,
                 marginEnd: 10
                 //fontFamily: 'Sigmar-Regular'
-            }}>{route.params.currentUser}</Text>
+            }}>{user.username}</Text>
         </View>
         <View style={{
             height: 5,
@@ -175,23 +124,32 @@ function User({ navigation, route }) {
                 }}>
                     <Text style={{
                         marginTop: 10,
+                        borderWidth: 3,
+                        borderColor: 'white',
+                        width:380,
+                        borderRadius:5,
+                        backgroundColor:'white',
                         textAlign: 'center',
-                        color: 'white',
+                        color: 'orange',
                         fontWeight: 'bold',
                         fontSize: 25,
                     }}>Library</Text>
                     <View style={{
                         flex: 1,
-                        marginTop: 20,
+                        marginTop: 10,
                         marginStart: 10,
                         marginEnd: 10,
                         marginBottom: 10,
+                        borderWidth:4,
+                        borderColor:'white',
+                        borderRadius:5,
+                        width:380,
+                        padding:10,
                         alignContent: 'center',
                         justifyContent: 'center',
                         height: 500
                     }}>
                         <FlatList
-
                             nestedScrollEnabled={true}
                             data={library}
                             renderItem={({ item }) => (<RecipeItem item={item} onPress={() => selectRecipe(item)} />)}
@@ -207,18 +165,23 @@ function User({ navigation, route }) {
                     marginTop: 10,
                 }}>
                     <Text style={{
-                        textAlign: 'center',
-                        color: 'white',
-                        fontWeight: 'bold',
-                        fontSize: 25,
-                        marginBottom: 10,
+                         marginTop: 20,
+                         borderWidth: 3,
+                         borderColor: 'white',
+                         width:380,
+                         borderRadius:5,
+                         backgroundColor:'white',
+                         textAlign: 'center',
+                         color: 'orange',
+                         fontWeight: 'bold',
+                         fontSize: 25,
                     }}>Recently Viewed</Text>
                     <View>
                         <FlatList
                             nestedScrollEnabled={true}
                             horizontal={true}
                             data={history}
-                            renderItem={({ item }) => (<SimilarItem item={item} onPress={() => setid(item.id)} />)}
+                            renderItem={({ item }) => (<SimilarItem item={item} onPress={() => selectRecipe(item)} />)}
                             keyExtractor={item => item.id}
                         />
 

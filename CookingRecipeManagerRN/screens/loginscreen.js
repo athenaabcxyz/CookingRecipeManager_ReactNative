@@ -44,13 +44,14 @@ function LoginScreen({ navigation, route }) {
             .then((userCredential) => {
                 // Signed in 
                 const user = userCredential.user;
+                Alert.alert('', "Login succeeded.")
                 navigation.navigate('Dishes', { currentUser: user })
                 setIsLoading(false)
                 // ...
             })
             .catch((error) => {
                 setIsLoading(false)
-                Alert.alert('', errorMessage)
+                Alert.alert('', "Login failed")
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 console.log(errorMessage)
