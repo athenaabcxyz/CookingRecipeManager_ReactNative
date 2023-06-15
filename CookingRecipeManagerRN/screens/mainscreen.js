@@ -13,7 +13,8 @@ import {
     RefreshControl,
     TouchableOpacity,
     Image,
-    BackHandler
+    BackHandler,
+    Alert
 } from 'react-native'
 import * as SQLite from "expo-sqlite";
 
@@ -72,8 +73,37 @@ function MainScreen({ navigation, route }) {
       
     }
 
+
+    function handleBackPress(){
+        Alert.alert(
+            'Exit App',
+            'Exit the application?',
+            [
+                {
+                    text: 'Cancel',
+                    onPress: () =>{
+                        console.log('Cancel Pressed')
+                    },
+                    style: 'cancel'
+                },
+                {
+                    text: 'Ok',
+                    onPress: () => BackHandler.exitApp(),
+                },
+            ],
+            {
+                cancelable: false,
+            },
+        );
+        return true;
+    }
+
     useEffect(()=>{
         updateUser()
+        BackHandler.addEventListener("hardwareBackPress",handleBackPress)
+        return () =>{
+            BackHandler.removeEventListener("hardwareBackPress",handleBackPress)
+        }
     },[])
 
     useEffect(() => {

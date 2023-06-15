@@ -17,7 +17,8 @@ import {
     TextInput,
     TouchableHighlight,
     Dimensions,
-    Alert
+    Alert,
+    BackHandler
 } from 'react-native'
 import * as SQLite from "expo-sqlite";
 import { useRoute } from '@react-navigation/native';
@@ -39,6 +40,19 @@ function RegisterScreen({ navigation, route }) {
     const [rePassm, setRePass] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const error = 'There is error while loading. \n (Ｔ▽Ｔ)'
+
+    function handleBackPress(){
+        navigation.goBack();
+        return true
+    }
+
+
+    useEffect(()=>{
+        BackHandler.addEventListener("hardwareBackPress",handleBackPress)
+        return() =>{
+            BackHandler.removeEventListener("hardwareBackPress", handleBackPress)
+        }
+    },[])
     registerCheck = () => {
         if (email == "" || password == "" || rePassm == ""||username=="")
             Alert.alert('', 'Please input all required information');

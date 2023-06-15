@@ -14,7 +14,8 @@ import {
     Image,
     TouchableOpacity,
     ScrollView,
-    BackHandler
+    BackHandler,
+    Alert
 } from 'react-native'
 
 import app from '../components/firebaseConfig';
@@ -76,9 +77,23 @@ function RecipeDetail({navigation, route}) {
         await updateDoc(docRef, {
             library: arrayUnion(id)
         });
+        Alert.alert('Library', 'Recipe saved to Library.')
         setSaved(true)
         updateUser()
     }
+
+    function handleBackPress(){
+        navigation.goBack();
+        return true
+    }
+
+
+    useEffect(()=>{
+        BackHandler.addEventListener("hardwareBackPress",handleBackPress)
+        return() =>{
+            BackHandler.removeEventListener("hardwareBackPress", handleBackPress)
+        }
+    },[])
 
     async function removefromlibrary(id){
         const docRef = doc(db, "users", user.uid);
@@ -86,6 +101,7 @@ function RecipeDetail({navigation, route}) {
         await updateDoc(docRef, {
             library: arrayRemove(id)
         });
+        Alert.alert('Library', 'Recipe removed from Library.')
         setSaved(false)
         updateUser()
     }
@@ -95,7 +111,7 @@ function RecipeDetail({navigation, route}) {
     };
 
     async function updateUser(){
-        const q = query(collection(db, "users"), where("uid", "==", currentUser.uid));
+        const q = query(collection(db, "users"), where("uid", "==", user.uid));
         const querySnapshot = await getDocs(q);
         querySnapshot.forEach((doc) => {
             setuser(doc.data())
@@ -136,6 +152,9 @@ function RecipeDetail({navigation, route}) {
     function viewInstruction(id) {
         navigation.navigate('Instruction', { id: id, currentUser: user })
     }
+    function toUser() {
+        navigation.navigate('User', { currentUser: user })
+    }
 
     return (<SafeAreaView style={{
         backgroundColor: "orange",
@@ -164,7 +183,9 @@ function RecipeDetail({navigation, route}) {
                 marginTop: 5,
                 //fontFamily: 'Sigmar-Regular'
             }}>{route.params.currentUser.username}</Text>
-            <TouchableOpacity style={{
+            <TouchableOpacity 
+            onPress={toUser}
+            style={{
                 height: 35,
                 width: 35,
                 marginStart: 10,

@@ -17,7 +17,7 @@ import {
     TextInput,
     TouchableHighlight,
     Dimensions,
-    Alert
+    Alert, BackHandler
 } from 'react-native'
 import * as SQLite from "expo-sqlite";
 import { useRoute } from '@react-navigation/native';
@@ -34,10 +34,45 @@ function LoginScreen({ navigation, route }) {
     const [isLoading, setIsLoading] = useState(false);
     const error = 'There is error while loading. \n (Ｔ▽Ｔ)'
 
+    function handleBackPress(){
+        Alert.alert(
+            'Exit App',
+            'Exit the application?',
+            [
+                {
+                    text: 'Cancel',
+                    onPress: () =>{
+                        console.log('Cancel Pressed')
+                    },
+                    style: 'cancel'
+                },
+                {
+                    text: 'Ok',
+                    onPress: () => BackHandler.exitApp(),
+                },
+            ],
+            {
+                cancelable: false,
+            },
+        );
+        return true;
+    }
+
+
+    useEffect(()=>{
+        BackHandler.addEventListener("hardwareBackPress",handleBackPress)
+        return() =>{
+            BackHandler.removeEventListener("hardwareBackPress", handleBackPress)
+        }
+    },[])
+
     toRegister = () => {
         navigation.navigate('Register')
     }
 
+    toResetPassword = () =>{
+        navigation.navigate('Reset')
+    }
     loginCheck = () => {
         setIsLoading(true)
         signInWithEmailAndPassword(auth, email, password)
@@ -148,6 +183,9 @@ function LoginScreen({ navigation, route }) {
                         value={password}>
                     </TextInput>
 
+                        <View style={{
+                            flexDirection: 'row'
+                        }}>
                     <TouchableHighlight style={{
                         justifyContent: 'center',
                         alignItems: 'center',
@@ -156,6 +194,7 @@ function LoginScreen({ navigation, route }) {
                         borderColor: 'white',
                         width: 100,
                         height: 40,
+                        marginStart: 20,
                         marginTop: 50,
                         borderRadius: 8,
                     }}
@@ -164,6 +203,7 @@ function LoginScreen({ navigation, route }) {
                             alignSelf: 'center',
                             color: 'white',
                             fontSize: 15,
+
                             fontWeight: '500'
                         }}>
                             LOGIN
@@ -173,10 +213,11 @@ function LoginScreen({ navigation, route }) {
                     <Text style={{
                         color: 'white',
                         textAlign: 'center',
-                        marginTop: 20,
+                        marginTop: 60,
                         fontSize: 15,
+                        marginStart: 30,
                         fontWeight: 'bold'
-                    }}>Don't have account?</Text>
+                    }}>Or</Text>
 
                     <TouchableHighlight style={{
                         justifyContent: 'center',
@@ -186,7 +227,8 @@ function LoginScreen({ navigation, route }) {
                         borderColor: 'white',
                         width: 100,
                         height: 40,
-                        marginTop: 10,
+                        marginStart: 30,
+                        marginTop: 50,
                         borderRadius: 8,
                     }}
                         onPress={toRegister} >
@@ -197,6 +239,36 @@ function LoginScreen({ navigation, route }) {
                             fontWeight: '500'
                         }}>
                             Register
+                        </Text>
+                    </TouchableHighlight>
+                    </View>
+                    <Text style={{
+                        color: 'white',
+                        textAlign: 'center',
+                        marginTop: 20,
+                        fontSize: 15,
+                        fontWeight: 'bold'
+                    }}>Forget Password?</Text>
+
+                    <TouchableHighlight style={{
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        alignSelf: 'center',
+                        borderWidth: 5,
+                        borderColor: 'white',
+                        width: 200,
+                        height: 40,
+                        marginTop: 10,
+                        borderRadius: 8,
+                    }}
+                        onPress={toResetPassword} >
+                        <Text style={{
+                            alignSelf: 'center',
+                            color: 'white',
+                            fontSize: 15,
+                            fontWeight: '500'
+                        }}>
+                            Reset password
                         </Text>
                     </TouchableHighlight>
 

@@ -9,6 +9,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import RecipeItem from './itemComponents/recipeItem';
 import React, { useState, useEffect } from 'react';
 import User from './screens/userscreen';
+import ResetPassword from './screens/resetpasswordscreen';
 
 
 const Stack = createNativeStackNavigator();
@@ -24,6 +25,7 @@ export default function App() {
         screenOptions={{
           headerShown: false
         }}>
+          <Stack.Screen name='Reset' component={ResetPassword}/>
           <Stack.Screen name='User' component={User}/>
           <Stack.Screen name='Dishes' component={MainScreen}/>
           <Stack.Screen name='Detail' component={RecipeDetail}/>

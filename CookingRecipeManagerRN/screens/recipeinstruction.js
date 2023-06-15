@@ -74,6 +74,9 @@ function RecipeInstruction({ navigation, route }) {
                 setGettingInstruction(false)
             })
     }
+    function toUser() {
+        navigation.navigate('User', { currentUser: user })
+    }
 
     return (<SafeAreaView style={{
         backgroundColor: "orange",
@@ -103,7 +106,9 @@ function RecipeInstruction({ navigation, route }) {
                 marginTop: 5,
                 //fontFamily: 'Sigmar-Regular'
             }}>{user.username}</Text>
-            <TouchableOpacity style={{
+            <TouchableOpacity 
+            onPress={toUser}
+            style={{
                 height: 35,
                 width: 35,
                 marginStart: 10,
