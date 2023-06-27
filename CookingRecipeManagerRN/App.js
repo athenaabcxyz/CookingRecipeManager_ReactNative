@@ -4,6 +4,7 @@ import MainScreen from './screens/mainscreen';
 import RecipeInstruction from './screens/recipeinstruction';
 import LoginScreen from './screens/loginscreen'
 import RegisterScreen from './screens/registerscreen'
+import IngredientSelect from './screens/ingredientselect'
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import RecipeItem from './itemComponents/recipeItem';
@@ -33,6 +34,7 @@ export default function App() {
           <Stack.Screen name='Instruction' component={RecipeInstruction}/>
           <Stack.Screen name='Login' component={LoginScreen} />
           <Stack.Screen name='Register' component={RegisterScreen} />
+          <Stack.Screen name='IngredientSelect' component={IngredientSelect} />
         </Stack.Navigator>
       </NavigationContainer>
   );
