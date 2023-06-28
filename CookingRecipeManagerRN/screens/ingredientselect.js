@@ -65,6 +65,18 @@ function IngredientSelect({ navigation, route }) {
         setRefresh(false);
     }, []);
 
+    const SeeResult = () => {
+        let array = "https://api.spoonacular.com/recipes/findByIngredients?ingredients=";
+        ingredientlist.forEach(element => {
+            let str = element.image
+            array = array + str.substr(0, str.length - 4) + ',+'
+        });
+        //array = array - ',+'
+        array = array + "&number=5&apiKey=" + apiKey
+        console.log(array)
+        navigation.navigate('SearchResult', { apilink: array, currentUser: user })
+    }
+
     const simpleSearch = () => {
         setFetching(true)
         console.log('searching: ' + search)
@@ -368,7 +380,7 @@ function IngredientSelect({ navigation, route }) {
                 renderItem={({ item }) => (<Ingredient2 item={item} />)}
                 keyExtractor={item => item.id} />
             <TouchableOpacity
-                onPress={Clear}
+                onPress={SeeResult}
                 style={{
                     height: 50,
                     paddingTop: 5,
