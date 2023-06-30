@@ -330,13 +330,7 @@ function IngredientSelect({ navigation, route }) {
                 backgroundColor: 'white',
                 marginBottom: 5
             }}></View>
-            <View style={{
-                paddingTop: 0,
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'column',
-            }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center' }}>
                     <View style={{
                         flexDirection: 'row',
                         width: '90%',
@@ -358,6 +352,12 @@ function IngredientSelect({ navigation, route }) {
                             style={{ flex: 1, paddingLeft: 10, paddingRight: 10, }} />
                     </View>
                 </View>
+            <View style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+            }}>
+                
                 <View style={{
                     justifyContent: 'center',
                     alignItems: 'center',
