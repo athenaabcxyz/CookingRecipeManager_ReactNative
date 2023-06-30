@@ -66,15 +66,17 @@ function IngredientSelect({ navigation, route }) {
     }, []);
 
     const SeeResult = () => {
-        let array = "https://api.spoonacular.com/recipes/findByIngredients?ingredients=";
-        ingredientlist.forEach(element => {
-            let str = element.image
-            array = array + str.substr(0, str.length - 4) + ',+'
-        });
-        //array = array - ',+'
-        array = array + "&number=5&apiKey=" + apiKey
-        console.log(array)
-        navigation.navigate('SearchResult', { apilink: array, currentUser: user })
+        if (ingredientlist.length > 0)
+        {
+            let array = "https://api.spoonacular.com/recipes/findByIngredients?ranking=1&ingredients=";
+            ingredientlist.forEach(element => {
+                let str = element.image
+                array = array + str.substr(0, str.length - 4) + ',+'
+            });
+            //array = array - ',+'
+            array = array + "&number=5&apiKey=" + apiKey
+            navigation.navigate('SearchResult', { apilink: array, currentUser: user })
+        }
     }
     async function updateUser(){
         const q = query(collection(db, "users"), where("uid", "==", user.uid));
@@ -100,7 +102,7 @@ function IngredientSelect({ navigation, route }) {
     const simpleSearch = () => {
         setFetching(true)
         console.log('searching: ' + search)
-        fetch("https://api.spoonacular.com/food/ingredients/search?query=" + search + "&number=10&sort=calories&sortDirection=desc&apiKey=" + apiKey)
+        fetch("https://api.spoonacular.com/food/ingredients/search?query=" + search + "&number=10&apiKey=" + apiKey)
             .then(res => res.json())
             .then(json => {
                 console.log(json.results)
@@ -401,6 +403,7 @@ function IngredientSelect({ navigation, route }) {
                             Please input ingredient name about to filter ingredients list.
                         </Text>) : (
                             <FlatList
+                                scrollsToTop={true}
                                 scrollEnabled={true}
                                 nestedScrollEnabled={true}
                                 data={searchResult}

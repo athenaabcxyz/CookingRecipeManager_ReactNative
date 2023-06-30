@@ -15,7 +15,8 @@ import {
     TouchableOpacity,
     ScrollView,
     BackHandler,
-    Alert
+    Alert,
+    LogBox
 } from 'react-native'
 
 import app from '../components/firebaseConfig';
@@ -89,6 +90,7 @@ function RecipeDetail({navigation, route}) {
 
 
     useEffect(()=>{
+        LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
         BackHandler.addEventListener("hardwareBackPress",handleBackPress)
         return() =>{
             BackHandler.removeEventListener("hardwareBackPress", handleBackPress)
@@ -330,7 +332,8 @@ function RecipeDetail({navigation, route}) {
                         width: 300,
                         borderRadius: 10,
                     }}>
-                    <FlatList
+                    <SafeAreaView style={{ flex: 1 }}>
+                        <FlatList
                             nestedScrollEnabled={true}
                             data={recipe.extendedIngredients}
                             renderItem={({ item }) => (<IngredientItem item={item} />)}
@@ -341,7 +344,7 @@ function RecipeDetail({navigation, route}) {
                             }}
 
                         />
-
+                    </SafeAreaView>
                     </View>
                 </View>
                 <View style={{

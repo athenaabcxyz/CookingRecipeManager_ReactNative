@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import RecipeItem from '../itemComponents/recipeItem';
+import RecipeItem2 from '../itemComponents/recipeItem2';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import {
     View,
@@ -14,7 +14,8 @@ import {
     TouchableOpacity,
     Image,
     BackHandler,
-    Alert
+    Alert,
+    LogBox
 } from 'react-native'
 import * as SQLite from "expo-sqlite";
 
@@ -30,8 +31,8 @@ const apiKey = "12ac99b1218346a48dce60a6266c7a3a";
 
 function SearchResult({ navigation, route }) {
     const Stack = createNativeStackNavigator();
-    const currentScreen = "Dishes";
-    <Stack.Screen name='RecipeItem' component={RecipeItem} />
+    const currentScreen = "SearchResult";
+    <Stack.Screen name='RecipeItem2' component={RecipeItem2} />
     const [recipes, setrecipes] = useState([]);
     const [user, setuser] = useState([]);
     const [currentUser, setCurrentUser] = useState(route.params.currentUser)
@@ -78,6 +79,7 @@ function SearchResult({ navigation, route }) {
     }
 
     useEffect(()=>{
+        LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
         updateUser()
         BackHandler.addEventListener("hardwareBackPress",handleBackPress)
         return () =>{
@@ -170,14 +172,14 @@ function SearchResult({ navigation, route }) {
         }}>{(dataLength > 0) ? (<FlatList
             refreshControl={<RefreshControl refreshing={isFetching} onRefresh={onRefresh} />}
             data={recipes}
-            renderItem={({ item }) => (<RecipeItem item={item} onPress={() => selectRecipe(item)} />)}
+            renderItem={({ item }) => (<RecipeItem2 item={item} onPress={() => selectRecipe(item)} />)}
             keyExtractor={item => item.id}
         />) : (
             <View style={{ flexDirection: 'column' }}>
                 <Text style={{ textAlign: 'center', fontSize: 20 }}>
                     {sorry}
                 </Text>
-                <Text onPress={() => setapilink("https://api.spoonacular.com/recipes/random?number=20&apiKey=" + apiKey + "&tags=")} style={{ textAlign: 'center', fontSize: 20, color: 'blue' }}>Reload Page</Text>
+                <Text onPress={() => setapilink(apilink)} style={{ textAlign: 'center', fontSize: 20, color: 'blue' }}>Reload Page</Text>
             </View>)}
 
         </View>
