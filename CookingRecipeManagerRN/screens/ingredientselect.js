@@ -42,10 +42,10 @@ const ingredienta = [
         name: "banana bread mix",
     }
 ];
-
+const db = getFirestore(app);
 function IngredientSelect({ navigation, route }) {
-    const currentScreen ="IngredientSelect";
-    const [user, setUser] = useState(route.params.currentUser)
+    const currentScreen = "IngredientSelect";
+    const [user, setuser] = useState(route.params.currentUser)
     const [loggedin, setloggedin] = useState(false);
     const [id, setid] = useState(route.params.id);
     const [isFetching, setFetching] = useState(false);
@@ -76,6 +76,26 @@ function IngredientSelect({ navigation, route }) {
         console.log(array)
         navigation.navigate('SearchResult', { apilink: array, currentUser: user })
     }
+    async function updateUser(){
+        const q = query(collection(db, "users"), where("uid", "==", user.uid));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            setuser(doc.data())
+        });
+      
+    }
+    function handleBackPress(){
+        navigation.goBack();
+        return true
+    }
+
+    useEffect(()=>{
+        updateUser()
+        BackHandler.addEventListener("hardwareBackPress",handleBackPress)
+        return () =>{
+            BackHandler.removeEventListener("hardwareBackPress",handleBackPress)
+        }
+    },[])
 
     const simpleSearch = () => {
         setFetching(true)
@@ -173,7 +193,7 @@ function IngredientSelect({ navigation, route }) {
                         }}>{ingredientName}</Text>
                 </View>
                 <TouchableOpacity
-                    onPress={()=> Add(item)}
+                    onPress={() => Add(item)}
                     style={{
                         height: 35,
                         width: 35,
@@ -284,7 +304,7 @@ function IngredientSelect({ navigation, route }) {
                 fontSize: 20,
                 fontWeight: 'bold',
                 color: 'white',
-                marginStart: 110,
+                marginStart: 60,
                 marginTop: 5,
                 //fontFamily: 'Sigmar-Regular'
             }}>{user.username}</Text>
@@ -303,105 +323,154 @@ function IngredientSelect({ navigation, route }) {
                         tintColor: 'white'
                     }} />
             </TouchableOpacity>
+
         </View>
-        <View style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            flexDirection: 'column',
-        }}>
-            <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center' }}>
-                <View style={{
-                    flexDirection: 'row',
-                    width: '90%',
-                    borderColor: 'white',
-                    borderRadius: 10,
-                    borderWidth: 5,
-                    alignContent: 'center',
-                    marginTop: 10,
-                    width: 350
-                }}>
-                    <TextInput
-                        onChangeText={(text) => { setSearch(text) }}
-                        onSubmitEditing={simpleSearch}
-                        placeholder={textInput}
-                        placeholderTextColor={'white'}
-                        textAlign='left'
-                        fontWeight='bold'
-                        color='white'
-                        style={{ flex: 1, paddingLeft: 10, paddingRight: 10, }} />
+            <View style={{
+                height: 5,
+                backgroundColor: 'white',
+                marginBottom: 5
+            }}></View>
+            <View style={{
+                paddingTop: 0,
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexDirection: 'column',
+            }}>
+                <View style={{ flexDirection: 'row', justifyContent: 'center', alignContent: 'center' }}>
+                    <View style={{
+                        flexDirection: 'row',
+                        width: '90%',
+                        borderColor: 'white',
+                        borderRadius: 10,
+                        borderWidth: 5,
+                        alignContent: 'center',
+                        marginTop: 10,
+                        width: 350
+                    }}>
+                        <TextInput
+                            onChangeText={(text) => { setSearch(text) }}
+                            onSubmitEditing={simpleSearch}
+                            placeholder={textInput}
+                            placeholderTextColor={'white'}
+                            textAlign='left'
+                            fontWeight='bold'
+                            color='white'
+                            style={{ flex: 1, paddingLeft: 10, paddingRight: 10, }} />
+                    </View>
                 </View>
-            </View>
-            <Text style={{
-                marginTop: 10,
-                textAlign: 'center',
-                color: 'white',
-                fontWeight: 'bold',
-                fontSize: 25,
-                width: 300,
-            }}>Results</Text>
-            {isFetching ? (
                 <View style={{
                     justifyContent: 'center',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    flexDirection: 'column',
                 }}>
-                    <ActivityIndicator size="large" color="white" style={{
-                        alignSelf: 'center',
-                        marginTop: 150
-                    }} />
+                    <Text style={{
+                         marginTop: 20,
+                         borderWidth: 3,
+                         borderColor: 'white',
+                         width:380,
+                         borderRadius:5,
+                         backgroundColor:'white',
+                         textAlign: 'center',
+                         color: 'orange',
+                         fontWeight: 'bold',
+                         fontSize: 25,
+                    }}>Results</Text>
+                    <View style={{
+                        flex: 1,
+                        marginTop: 10,
+                        marginStart: 10,
+                        marginEnd: 10,
+                        marginBottom: 10,
+                        borderWidth: 4,
+                        borderColor: 'white',
+                        borderRadius: 5,
+                        width: 380,
+                        padding: 10,
+                        alignContent: 'center',
+                        justifyContent: 'center',
+                        height: 200,
+                        maxHeight: 200
+                    }}>
+
+                        {searchResult.length<=0? (<Text style={{
+                            textAlign: 'center',
+                            color: 'white',
+                            fontWeight: 'bold',
+                            fontSize: 25,
+                        }}>
+                            Please input ingredient name about to filter ingredients list.
+                        </Text>) : (
+                            <FlatList
+                                scrollEnabled={true}
+                                nestedScrollEnabled={true}
+                                data={searchResult}
+                                renderItem={({ item }) => (<Ingredient item={item} />)}
+                                keyExtractor={item => item.id} />)}
+                    </View>
+                    <Text style={{
+                         marginTop: 20,
+                         borderWidth: 3,
+                         borderColor: 'white',
+                         width:380,
+                         borderRadius:5,
+                         backgroundColor:'white',
+                         textAlign: 'center',
+                         color: 'orange',
+                         fontWeight: 'bold',
+                         fontSize: 25,
+                    }}>Included</Text>
+                    <View style={{
+                        flex: 1,
+                        marginTop: 10,
+                        marginStart: 10,
+                        marginEnd: 10,
+                        marginBottom: 10,
+                        borderWidth: 4,
+                        borderColor: 'white',
+                        borderRadius: 5,
+                        width: 380,
+                        padding: 10,
+                        alignContent: 'center',
+                        justifyContent: 'center',
+                        height: 200,
+                        maxHeight: 200
+                    }}>
+                        {ingredientlist.length<=0 ? (<Text style={{
+                            textAlign: 'center',
+                            color: 'white',
+                            fontWeight: 'bold',
+                            fontSize: 25,
+                        }}>
+                            You haven't selected any ingredient yet.
+                        </Text>) : (
+                            <FlatList
+                                scrollEnabled={true}
+                                nestedScrollEnabled={true}
+                                data={ingredientlist}
+                                extraData={refresh}
+                                renderItem={({ item }) => (<Ingredient2 item={item} />)}
+                                keyExtractor={item => item.id} />)}
+                    </View>
+                    <TouchableOpacity
+                        onPress={SeeResult}
+                        style={{
+                            borderWidth: 5,
+                            borderColor: 'white',
+                            borderRadius: 10,
+                            backgroundColor: 'orange',
+                            width: 300,
+                            justifyContent: 'center',
+                            marginTop: 10,
+                        }}>
+                        <Text style={{
+                            textAlign: 'center',
+                            fontSize: 25,
+                            fontWeight: 'bold',
+                            color: 'white'
+                        }}>Search with selected ingredients.</Text>
+                    </TouchableOpacity>
                 </View>
-            ) : (
-            <FlatList
-                style={{
-                    width: 300,
-                    height: 270,
-                }}
-                scrollEnabled={true}
-                nestedScrollEnabled={true}
-                data={searchResult}
-                renderItem={({ item }) => (<Ingredient item={item} />)}
-                keyExtractor={item => item.id} />)}
-            <Text style={{
-                marginTop: 10,
-                textAlign: 'center',
-                color: 'white',
-                fontWeight: 'bold',
-                fontSize: 25,
-                width: 300,
-            }}>Included</Text>
-            <FlatList
-                style={{
-                    width: 300,
-                    height: 270,
-                }}
-                scrollEnabled={true}
-                nestedScrollEnabled={true}
-                data={ingredientlist}
-                extraData={refresh}
-                renderItem={({ item }) => (<Ingredient2 item={item} />)}
-                keyExtractor={item => item.id} />
-            <TouchableOpacity
-                onPress={SeeResult}
-                style={{
-                    height: 50,
-                    paddingTop: 5,
-                    paddingLeft: 5,
-                    paddingRight: 5,
-                    marginTop: 5,
-                    marginStart: 0,
-                    flexDirection: 'row',
-                    borderRadius: 10,
-                    backgroundColor: 'white',
-                    borderWidth: 2,
-                    borderColor: 'green'
-                }}>
-                <Text
-                    style={{
-                        color: 'black',
-                        fontSize: 20,
-                        fontWeight: 'bold'
-                    }}>Find!</Text>
-            </TouchableOpacity>
-        </View>
+            </View>
     </SafeAreaView>);
 }
 

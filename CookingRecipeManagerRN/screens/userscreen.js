@@ -98,7 +98,7 @@ function User({ navigation, route }) {
     }
 
     useEffect(()=>{
-        setHistory(user.history)
+        setHistory(user.history.slice(0).reverse().map(element =>{return element}))
         setLibrary(user.library)
     },[user])
 
@@ -316,13 +316,20 @@ function User({ navigation, route }) {
                         justifyContent: 'center',
                         height: 500
                     }}>
+                        {library.length<=0?(<Text style={{
+                            textAlign: 'center',
+                            color: 'white',
+                            fontWeight: 'bold',
+                            fontSize: 25,
+                        }}>
+                            Your library is currently empty.
+                        </Text>):(
                         <FlatList
                             nestedScrollEnabled={true}
                             data={library}
                             renderItem={({ item }) => (<RecipeItem item={item} onPress={() => selectRecipe(item)} />)}
                             keyExtractor={item => item.id}
-                        />
-
+                        />)}
                     </View>
                 </View>
                 <View style={{
@@ -344,15 +351,32 @@ function User({ navigation, route }) {
                          fontSize: 25,
                     }}>Recently Viewed</Text>
                     <View style={{
-                        maxHeight: 100
+                        height: 120,
+                        marginTop: 10,
+                        marginStart: 10,
+                        marginEnd: 10,
+                        marginBottom: 10,
+                        borderWidth:4,
+                        borderColor:'white',
+                        borderRadius:5,
+                        width:380,
+                        alignContent: 'center',
+                        justifyContent: 'center',
                     }}>
-                        <FlatList
+                        {history<=0?(<Text style={{
+                            textAlign: 'center',
+                            color: 'white',
+                            fontWeight: 'bold',
+                            fontSize: 25,
+                        }}>
+                            Your haven't view anything yet.
+                        </Text>):(<FlatList
                             nestedScrollEnabled={true}
                             horizontal={true}
                             data={history}
                             renderItem={({ item }) => (<SimilarItem item={item} onPress={() => selectRecipe(item)} />)}
                             keyExtractor={item => item.id}
-                        />
+                        />)}
 
                     </View>
                 </View>
@@ -367,7 +391,7 @@ function User({ navigation, route }) {
                             borderWidth: 5,
                             borderColor: 'white',
                             borderRadius: 10,
-                            backgroundColor: 'white',
+                            backgroundColor: 'orange',
                             width: 300,
                             justifyContent: 'center',
                             marginTop: 10,
@@ -376,7 +400,7 @@ function User({ navigation, route }) {
                             textAlign: 'center',
                             fontSize: 25,
                             fontWeight: 'bold',
-                            color: 'orange'
+                            color: 'white'
                         }}>
                             Change password</Text>
                     </TouchableOpacity>
@@ -393,7 +417,7 @@ function User({ navigation, route }) {
                             borderWidth: 5,
                             borderColor: 'white',
                             borderRadius: 10,
-                            backgroundColor: 'white',
+                            backgroundColor: 'orange',
                             width: 300,
                             justifyContent: 'center',
                             marginTop: 10,
@@ -402,7 +426,7 @@ function User({ navigation, route }) {
                             textAlign: 'center',
                             fontSize: 25,
                             fontWeight: 'bold',
-                            color: 'orange'
+                            color: 'white'
                         }}>
                             Logout</Text>
                     </TouchableOpacity>

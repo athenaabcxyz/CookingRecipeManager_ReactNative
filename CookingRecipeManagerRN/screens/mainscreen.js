@@ -167,6 +167,10 @@ function MainScreen({ navigation, route }) {
         updateUser()
     }
 
+    function toSearchByIngredients(){
+        navigation.navigate('IngredientSelect', { currentUser: user })
+    }
+
     async function selectRecipe(item) {
         await SaveToHistory(item)
         navigation.navigate('Detail', { id: item.id, currentUser: user })
@@ -237,6 +241,25 @@ function MainScreen({ navigation, route }) {
                     style={{ flex: 1, paddingLeft: 10, paddingRight: 10, }} />
             </View>
         </View>
+        <TouchableOpacity
+                        onPress={toSearchByIngredients}
+                        style={{
+                            borderWidth: 5,
+                            borderColor: 'white',
+                            borderRadius: 10,
+                            backgroundColor: 'white',
+                            width: 350,
+                            justifyContent: 'center',
+                            marginTop: 10,
+                            alignSelf: 'center'
+                        }}>
+                        <Text style={{
+                            textAlign: 'center',
+                            fontSize: 20,
+                            fontWeight: 'bold',
+                            color: 'orange'
+                        }}>Find dishes by ingredients.</Text>
+                    </TouchableOpacity>
         <View style={{
             flex: 1,
             marginTop: 20,

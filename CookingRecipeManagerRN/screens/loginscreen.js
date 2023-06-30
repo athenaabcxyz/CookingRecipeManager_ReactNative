@@ -80,7 +80,7 @@ function LoginScreen({ navigation, route }) {
                 // Signed in 
                 const user = userCredential.user;
                 Alert.alert('', "Login succeeded.")
-                navigation.navigate('IngredientSelect', { currentUser: user })
+                navigation.navigate('Dishes', { currentUser: user })
                 setIsLoading(false)
                 // ...
             })

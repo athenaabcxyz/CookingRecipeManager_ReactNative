@@ -33,8 +33,8 @@ function SearchResult({ navigation, route }) {
     const currentScreen = "Dishes";
     <Stack.Screen name='RecipeItem' component={RecipeItem} />
     const [recipes, setrecipes] = useState([]);
+    const [user, setuser] = useState([]);
     const [currentUser, setCurrentUser] = useState(route.params.currentUser)
-    const [user, setuser] = useState();
     const [apilink, setapilink] = useState(route.params.apilink);
     const [isFetching, setFetching] = useState(false);
     const [dataLength, setDataLength] = useState(1);
