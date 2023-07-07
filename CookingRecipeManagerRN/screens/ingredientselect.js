@@ -288,6 +288,9 @@ function IngredientSelect({ navigation, route }) {
         flex: 1,
         marginTop: StatusBar.currentHeight
     }}>
+        <ScrollView 
+        nestedScrollEnabled = {true}
+        >
         <View style={{
             flexDirection: 'row',
             marginTop: 10,
@@ -462,6 +465,7 @@ function IngredientSelect({ navigation, route }) {
                             borderRadius: 10,
                             backgroundColor: 'orange',
                             width: 300,
+                            marginBottom: 20,
                             justifyContent: 'center',
                             marginTop: 10,
                         }}>
@@ -474,6 +478,7 @@ function IngredientSelect({ navigation, route }) {
                     </TouchableOpacity>
                 </View>
             </View>
+            </ScrollView>
     </SafeAreaView>);
 }
 
